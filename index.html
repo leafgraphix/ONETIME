@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One-Thing Timer | Focus for ADHD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --accent-green: #00d084;
+            --accent-yellow: #ffd700;
+            --accent-red: #ff4757;
+            --accent-blue: #3498db;
+            --accent-purple: #9b59b6;
+            --border: #2a2a3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Auth Screen */
+        .auth-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .auth-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .auth-container {
+            width: 90%;
+            max-width: 400px;
+            padding: 2rem;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .auth-form {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 208, 132, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .auth-switch a {
+            color: var(--accent-green);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: var(--accent-red);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        /* Main App */
+        .app {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .app.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 240px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-logo h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--accent-green);
+            border-left-color: var(--accent-green);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .user-plan {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .logout-btn:hover {
+            color: var(--accent-red);
+        }
+
+        /* Main Content Area */
+        .main-area {
+            margin-left: 240px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        /* Page Container */
+        .page {
+            display: none;
+            padding: 2rem;
+            max-width: 1200px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ===== TIMER PAGE ===== */
+        .timer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .task-section {
+            width: 100%;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .task-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.75rem;
+        }
+
+        .task-input {
+            width: 100%;
+            padding: 1.25rem;
+            font-size: 1.25rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            color: var(--text-primary);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .task-input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        .timer-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin-bottom: 2rem;
+        }
+
+        .timer-svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .timer-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 8;
+        }
+
+        .timer-progress {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+        }
+
+        .timer-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .time-display {
+            font-size: 3.5rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        .time-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .timer-status {
+            position: absolute;
+            bottom: 18%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 0.4rem 1rem;
+            background: var(--bg-primary);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-btn {
+            padding: 0.7rem 1.25rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--text-primary);
+        }
+
+        .mode-btn.active {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: var(--bg-primary);
+        }
+
+        .action-btn {
+            padding: 0.875rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            color: white;
+        }
+
+        .btn-start:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(0, 208, 132, 0.4);
+        }
+
+        .btn-pause {
+            background: var(--accent-yellow);
+            color: var(--bg-primary);
+        }
+
+        .btn-reset {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-reset:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Parking Lot */
+        .parking-lot {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .parking-lot-header {
+            margin-bottom: 0.75rem;
+        }
+
+        .parking-lot-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .parking-lot-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .parking-lot-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .parking-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .parking-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.4rem 0.875rem;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .parking-item button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .parking-item button:hover {
+            color: var(--accent-red);
+        }
+
+        /* ===== DASHBOARD PAGE ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+        }
+
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .stat-card .subtext {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .time-filter {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 0.25rem;
+        }
+
+        .time-filter button {
+            padding: 0.4rem 0.75rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-filter button.active {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .task-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .task-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .task-duration {
+            font-size: 0.9rem;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .chart-container {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 0.5rem;
+            padding-top: 1rem;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--accent-green), var(--accent-blue));
+            border-radius: 6px 6px 0 0;
+            min-height: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        .chart-bar .label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .chart-bar .value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .streak-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .streak-number {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .streak-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== SUBSCRIPTION PAGE ===== */
+        .subscription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .current-plan {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .plan-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .plan-badge.free {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .plan-badge.pro {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            color: white;
+        }
+
+        .plan-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .plan-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-5px);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--accent-green);
+            position: relative;
+        }
+
+        .pricing-card.featured::before {
+            content: 'MOST POPULAR';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-card .price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 1rem 0;
+        }
+
+        .pricing-card .price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .pricing-card .description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            text-align: left;
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        .pricing-card .btn {
+            width: 100%;
+        }
+
+        .billing-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .billing-section h3 {
+            margin-bottom: 1rem;
+        }
+
+        .billing-history {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .billing-history th,
+        .billing-history td {
+            text-align: left;
+            padding: 0.875rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .billing-history th {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .billing-history td {
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.paid {
+            background: rgba(0, 208, 132, 0.2);
+            color: var(--accent-green);
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 200px;
+            }
+            .main-area {
+                margin-left: 200px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-area {
+                margin-left: 0;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Screen -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-container">
+            <div class="logo">
+                <h1>One-Thing</h1>
+                <p>Focus timer designed for ADHD brains</p>
+            </div>
+
+            <div class="auth-form" id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="you@example.com">
+                    <div class="error-message" id="loginEmailError">Please enter a valid email</div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
+                    <div class="error-message" id="loginPasswordError">Password must be at least 6 characters</div>
+                </div>
+                <button class="btn btn-primary" onclick="handleLogin()">Sign In</button>
+                <div class="auth-switch">
+                    Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>
+                </div>
+            </div>
+
+            <div class="auth-form" id="signupForm" style="display: none;">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="signupName" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="signupEmail" placeholder="you@example.com">
+                    <div class="error-message" id="signupEmailError">Please enter a valid email</div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signupPassword" placeholder="••••••••">
+                    <div class="error-message" id="signupPasswordError">Password must be at least 6 characters</div>
+                </div>
+                <button class="btn btn-primary" onclick="handleSignup()">Create Account</button>
+                <div class="auth-switch">
+                    Already have an account? <a onclick="toggleAuthMode()">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app" id="mainApp">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>One-Thing</h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item active" onclick="navigateTo('timer')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    <span>Timer</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="navigateTo('subscription')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <span>Subscription</span>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">User</div>
+                        <div class="user-plan" id="userPlan">Free Plan</div>
+                    </div>
+                    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-area">
+            <!-- Timer Page -->
+            <div class="page active" id="timerPage">
+                <div class="page-header">
+                    <h1>Focus Timer</h1>
+                    <p>Focus on your one thing at a time</p>
+                </div>
+                
+                <div class="timer-content">
+                    <section class="task-section">
+                        <div class="task-label">Your One Thing</div>
+                        <input type="text" class="task-input" id="taskInput" 
+                               placeholder="What are you doing right now?" 
+                               maxlength="50">
+                    </section>
+
+                    <div class="timer-container">
+                        <svg class="timer-svg" viewBox="0 0 200 200">
+                            <circle class="timer-bg" cx="100" cy="100" r="90"></circle>
+                            <circle class="timer-progress" id="timerProgress" cx="100" cy="100" r="90"
+                                    stroke-dasharray="565.48" stroke-dashoffset="0" stroke="#00d084"></circle>
+                        </svg>
+                        <div class="timer-center">
+                            <div class="time-display" id="timeDisplay">10:00</div>
+                            <div class="time-label">remaining</div>
+                        </div>
+                        <div class="timer-status" id="timerStatus">Ready</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="mode-btn active" data-minutes="10" onclick="setMode(10)">10/3 ADHD</button>
+                        <button class="mode-btn" data-minutes="25" onclick="setMode(25)">25/5 Classic</button>
+                        <button class="mode-btn" data-minutes="45" onclick="setMode(45)">45/15 Deep</button>
+                        <button class="mode-btn" data-minutes="custom" onclick="setCustomMode()">Custom</button>
+                    </div>
+
+                    <div class="controls">
+                        <button class="action-btn btn-start" id="startBtn" onclick="startTimer()">Start Focus</button>
+                        <button class="action-btn btn-pause" id="pauseBtn" onclick="pauseTimer()" style="display: none;">Pause</button>
+                        <button class="action-btn btn-reset" id="resetBtn" onclick="resetTimer()">Reset</button>
+                    </div>
+
+                    <section class="parking-lot">
+                        <div class="parking-lot-header">
+                            <span class="parking-lot-title">🚗 Parking Lot (for distractions)</span>
+                        </div>
+                        <input type="text" class="parking-lot-input" id="parkingInput" 
+                               placeholder="Type a distracting thought and press Enter..."
+                               onkeypress="handleParkingKeypress(event)">
+                        <div class="parking-items" id="parkingItems"></div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div class="page" id="dashboardPage">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <p>Track your focus journey and productivity</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">Today's Sessions</div>
+                        <div class="value" id="dashTodaySessions">0</div>
+                        <div class="subtext">Focus sessions completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Total Focus Time</div>
+                        <div class="value" id="dashTotalMinutes">0</div>
+                        <div class="subtext">Minutes focused</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Current Streak</div>
+                        <div class="value" id="dashStreak">0</div>
+                        <div class="subtext">Days in a row</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Tasks Completed</div>
+                        <div class="value" id="dashTasksCompleted">0</div>
+                        <div class="subtext">All time total</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Focus Activity</h3>
+                            <div class="time-filter">
+                                <button class="active" onclick="setChartPeriod('day')">Day</button>
+                                <button onclick="setChartPeriod('week')">Week</button>
+                                <button onclick="setChartPeriod('month')">Month</button>
+                                <button onclick="setChartPeriod('year')">Year</button>
+                            </div>
+                        </div>
+                        <div class="chart-container" id="activityChart"></div>
+                    </div>
+
+                    <div class="streak-card card">
+                        <div class="streak-number" id="streakDisplay">0</div>
+                        <div class="streak-label">Day Streak! 🔥</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Tasks</h3>
+                        <div class="time-filter">
+                            <button class="active" onclick="setTaskFilter('day')">Today</button>
+                            <button onclick="setTaskFilter('week')">This Week</button>
+                            <button onclick="setTaskFilter('month')">This Month</button>
+                            <button onclick="setTaskFilter('year')">This Year</button>
+                        </div>
+                    </div>
+                    <div class="task-list" id="taskList"></div>
+                </div>
+            </div>
+
+            <!-- Subscription Page -->
+            <div class="page" id="subscriptionPage">
+                <div class="page-header">
+                    <h1>Subscription</h1>
+                    <p>Manage your plan and billing</p>
+                </div>
+
+                <div class="subscription-header">
+                    <div class="current-plan">
+                        <div class="plan-badge free" id="currentPlanBadge">Free</div>
+                        <div class="plan-info">
+                            <h3 id="currentPlanName">Free Plan</h3>
+                            <p id="currentPlanDesc">Basic focus timer with limited history</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3>Free</h3>
+                        <div class="price">$0<span>/month</span></div>
+                        <p class="description">Perfect for getting started</p>
+                        <ul class="feature-list">
+                            <li>Basic timer (all modes)</li>
+                            <li>Parking lot (5 items)</li>
+                            <li>7-day history</li>
+                            <li>Basic statistics</li>
+                        </ul>
+                        <button class="btn btn-secondary" id="freePlanBtn" onclick="selectPlan('free')">Current Plan</button>
+                    </div>
+
+                    <div class="pricing-card featured">
+                        <h3>Pro</h3>
+                        <div class="price">$4<span>/month</span></div>
+                        <p class="description">For serious focus warriors</p>
+                        <ul class="feature-list">
+                            <li>Everything in Free</li>
+                            <li>Unlimited parking lot</li>
+                            <li>Unlimited history</li>
+                            <li>Advanced analytics</li>
+                            <li>Export data (CSV)</li>
+                            <li>Priority support</li>
+                        </ul>
+                        <button class="btn btn-primary" id="proPlanBtn" onclick="selectPlan('pro')">Upgrade to Pro</button>
+                    </div>
+
+                    <div class="pricing-card">
+                        <h3>Team</h3>
+                        <div class="price">$12<span>/month</span></div>
+                        <p class="description">For teams and organizations</p>
+                        <ul class="feature-list">
+                            <li>Everything in Pro</li>
+                            <li>Up to 10 team members</li>
+                            <li>Team dashboard</li>
+                            <li>Shared focus rooms</li>
+                            <li>Admin controls</li>
+                            <li>API access</li>
+                        </ul>
+                        <button class="btn btn-secondary" id="teamPlanBtn" onclick="selectPlan('team')">Contact Sales</button>
+                    </div>
+                </div>
+
+                <div class="billing-section">
+                    <h3>Billing History</h3>
+                    <table class="billing-history">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="billingHistory">
+                            <tr>
+                                <td colspan="4" class="empty-state">No billing history yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Completion Modal -->
+    <div class="modal-overlay" id="completionModal">
+        <div class="modal">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+            <h2>Session Complete!</h2>
+            <p style="color: var(--text-secondary); margin: 1rem 0 2rem;">Great job focusing on your one thing.</p>
+            <button class="btn btn-primary" onclick="closeModal()" style="width: auto; padding: 0.875rem 2rem;">Start Next</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== AUTH SYSTEM ====================
+        let currentUser = null;
+        let userSubscription = { plan: 'free', expiry: null };
+
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString(16);
+        }
+
+        window.onload = function() {
+            const savedUser = localStorage.getItem('onething_user');
+            const savedSub = localStorage.getItem('onething_subscription');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                if (savedSub) userSubscription = JSON.parse(savedSub);
+                showApp();
+            }
+            loadParkingLot();
+        };
+
+        function toggleAuthMode() {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            signupForm.style.display = signupForm.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !email.includes('@')) {
+                document.getElementById('loginEmailError').style.display = 'block';
+                return;
+            }
+            if (!password || password.length < 6) {
+                document.getElementById('loginPasswordError').style.display = 'block';
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('onething_users') || '[]');
+            const passwordHash = hashPassword(password);
+            const user = users.find(u => u.email === email && u.passwordHash === passwordHash);
+
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('onething_user', JSON.stringify(user));
+                const savedSub = localStorage.getItem(`onething_subscription_${user.id}`);
+                if (savedSub) userSubscription = JSON.parse(savedSub);
+                showApp();
+            } else {
+                alert('Invalid email or password');
+            }
+        }
+
+        function handleSignup() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+            if (!email || !email.includes('@')) {
+                document.getElementById('signupEmailError').style.display = 'block';
+                return;
+            }
+            if (!password || password.length < 6) {
+                document.getElementById('signupPasswordError').style.display = 'block';
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('onething_users') || '[]');
+            if (users.find(u => u.email === email)) {
+                alert('Email already registered');
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                passwordHash: hashPassword(password),
+                createdAt: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('onething_users', JSON.stringify(users));
+            localStorage.setItem('onething_user', JSON.stringify(newUser));
+
+            currentUser = newUser;
+            showApp();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('onething_user');
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.remove('active');
+            resetTimer();
+        }
+
+        function showApp() {
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.add('active');
+
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('userPlan').textContent = userSubscription.plan === 'free' ? 'Free Plan' : 
+                                                              userSubscription.plan === 'pro' ? 'Pro Plan' : 'Team Plan';
+            
+            updateSubscriptionUI();
+            loadDashboardData();
+            renderParkingItems();
+        }
+
+        // ==================== NAVIGATION ====================
+        function navigateTo(page) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            
+            event.currentTarget.classList.add('active');
+            document.getElementById(page + 'Page').classList.add('active');
+            
+            if (page === 'dashboard') {
+                loadDashboardData();
+            }
+        }
+
+        // ==================== TIMER SYSTEM ====================
+        let timerInterval = null;
+        let totalSeconds = 600;
+        let remainingSeconds = 600;
+        let isRunning = false;
+        let isPaused = false;
+
+        const CIRCUMFERENCE = 2 * Math.PI * 90;
+
+        function setMode(minutes) {
+            if (isRunning) return;
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.minutes == minutes) btn.classList.add('active');
+            });
+
+            if (minutes === 'custom') {
+                const custom = prompt('Enter minutes (1-60):', '15');
+                if (custom && !isNaN(custom)) {
+                    minutes = Math.min(60, Math.max(1, parseInt(custom)));
+                } else {
+                    return;
+                }
+            }
+
+            totalSeconds = minutes * 60;
+            remainingSeconds = totalSeconds;
+            updateDisplay();
+        }
+
+        function setCustomMode() {
+            setMode('custom');
+        }
+
+        function startTimer() {
+            const task = document.getElementById('taskInput').value.trim();
+            if (!task) {
+                document.getElementById('taskInput').focus();
+                document.getElementById('taskInput').style.borderColor = 'var(--accent-red)';
+                setTimeout(() => document.getElementById('taskInput').style.borderColor = '', 1000);
+                return;
+            }
+
+            isRunning = true;
+            isPaused = false;
+
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('timerStatus').textContent = 'Focusing...';
+            document.getElementById('taskInput').readOnly = true;
+
+            timerInterval = setInterval(() => {
+                if (remainingSeconds > 0) {
+                    remainingSeconds--;
+                    updateDisplay();
+                    updateProgress();
+                } else {
+                    completeTimer();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (isPaused) {
+                isPaused = false;
+                document.getElementById('pauseBtn').textContent = 'Pause';
+                document.getElementById('timerStatus').textContent = 'Focusing...';
+                timerInterval = setInterval(() => {
+                    if (remainingSeconds > 0) {
+                        remainingSeconds--;
+                        updateDisplay();
+                        updateProgress();
+                    } else {
+                        completeTimer();
+                    }
+                }, 1000);
+            } else {
+                isPaused = true;
+                clearInterval(timerInterval);
+                document.getElementById('pauseBtn').textContent = 'Resume';
+                document.getElementById('timerStatus').textContent = 'Paused';
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            isPaused = false;
+            remainingSeconds = totalSeconds;
+
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('pauseBtn').textContent = 'Pause';
+            document.getElementById('timerStatus').textContent = 'Ready';
+            document.getElementById('taskInput').readOnly = false;
+
+            updateDisplay();
+            updateProgress();
+        }
+
+        function updateDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            document.getElementById('timeDisplay').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgress() {
+            const progress = remainingSeconds / totalSeconds;
+            const offset = CIRCUMFERENCE * (1 - progress);
+            const circle = document.getElementById('timerProgress');
+            circle.style.strokeDashoffset = offset;
+
+            if (progress > 0.5) circle.style.stroke = 'var(--accent-green)';
+            else if (progress > 0.2) circle.style.stroke = 'var(--accent-yellow)';
+            else circle.style.stroke = 'var(--accent-red)';
+        }
+
+        function completeTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            saveSession();
+            createConfetti();
+            document.getElementById('completionModal').classList.add('active');
+            resetTimer();
+        }
+
+        function closeModal() {
+            document.getElementById('completionModal').classList.remove('active');
+            document.querySelectorAll('.confetti').forEach(c => c.remove());
+        }
+
+        function createConfetti() {
+            const colors = ['#00d084', '#3498db', '#ffd700', '#ff4757'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                document.body.appendChild(confetti);
+            }
+        }
+
+        // ==================== SESSION STORAGE ====================
+        function saveSession() {
+            if (!currentUser) return;
+
+            const sessions = JSON.parse(localStorage.getItem(`onething_sessions_${currentUser.id}`) || '[]');
+            const session = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                duration: totalSeconds - remainingSeconds,
+                task: document.getElementById('taskInput').value,
+                completed: remainingSeconds === 0
+            };
+            sessions.push(session);
+            localStorage.setItem(`onething_sessions_${currentUser.id}`, JSON.stringify(sessions));
+        }
+
+        function getSessions() {
+            if (!currentUser) return [];
+            return JSON.parse(localStorage.getItem(`onething_sessions_${currentUser.id}`) || '[]');
+        }
+
+        // ==================== DASHBOARD ====================
+        let currentChartPeriod = 'day';
+        let currentTaskFilter = 'day';
+
+        function loadDashboardData() {
+            const sessions = getSessions();
+            const today = new Date().toDateString();
+            const now = new Date();
+
+            // Calculate stats
+            const todaySessions = sessions.filter(s => new Date(s.date).toDateString() === today);
+            const totalMinutes = Math.floor(sessions.reduce((acc, s) => acc + s.duration, 0) / 60);
+            
+            // Streak calculation
+            let streak = 0;
+            const dates = [...new Set(sessions.map(s => new Date(s.date).toDateString()))].sort();
+            const todayIndex = dates.indexOf(today);
+            
+            if (todayIndex !== -1 || dates[dates.length - 1] === new Date(Date.now() - 86400000).toDateString()) {
+                streak = 1;
+                for (let i = dates.length - 2; i >= 0; i--) {
+                    const current = new Date(dates[i + 1]);
+                    const previous = new Date(dates[i]);
+                    const diff = (current - previous) / (1000 * 60 * 60 * 24);
+                    if (diff === 1) streak++;
+                    else break;
+                }
+            }
+
+            // Update stat cards
+            document.getElementById('dashTodaySessions').textContent = todaySessions.length;
+            document.getElementById('dashTotalMinutes').textContent = totalMinutes;
+            document.getElementById('dashStreak').textContent = streak;
+            document.getElementById('dashTasksCompleted').textContent = sessions.filter(s => s.completed).length;
+            document.getElementById('streakDisplay').textContent = streak;
+
+            renderChart();
+            renderTaskList();
+        }
+
+        function setChartPeriod(period) {
+            currentChartPeriod = period;
+            document.querySelectorAll('#dashboardPage .time-filter button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(period)) btn.classList.add('active');
+            });
+            renderChart();
+        }
+
+        function renderChart() {
+            const sessions = getSessions();
+            const container = document.getElementById('activityChart');
+            
+            let data = [];
+            const now = new Date();
+            
+            if (currentChartPeriod === 'day') {
+                // Last 24 hours
+                for (let i = 0; i < 8; i++) {
+                    const hour = new Date(now.getTime() - i * 3 * 60 * 60 * 1000);
+                    const hourSessions = sessions.filter(s => {
+                        const sDate = new Date(s.date);
+                        return sDate.getHours() >= hour.getHours() && sDate.getHours() < hour.getHours() + 3;
+                    });
+                    data.unshift({
+                        label: `${hour.getHours()}:00`,
+                        value: Math.floor(hourSessions.reduce((a, s) => a + s.duration, 0) / 60)
+                    });
+                }
+            } else if (currentChartPeriod === 'week') {
+                for (let i = 6; i >= 0; i--) {
+                    const day = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                    const daySessions = sessions.filter(s => new Date(s.date).toDateString() === day.toDateString());
+                    data.push({
+                        label: day.toLocaleDateString('en', { weekday: 'short' }),
+                        value: Math.floor(daySessions.reduce((a, s) => a + s.duration, 0) / 60)
+                    });
+                }
+            } else if (currentChartPeriod === 'month') {
+                for (let i = 0; i < 4; i++) {
+                    const weekStart = new Date(now.getTime() - (i + 1) * 7 * 24 * 60 * 60 * 1000);
+                    const weekEnd = new Date(now.getTime() - i * 7 * 24 * 60 * 60 * 1000);
+                    const weekSessions = sessions.filter(s => {
+                        const sDate = new Date(s.date);
+                        return sDate >= weekStart && sDate < weekEnd;
+                    });
+                    data.unshift({
+                        label: `W${4-i}`,
+                        value: Math.floor(weekSessions.reduce((a, s) => a + s.duration, 0) / 60)
+                    });
+                }
+            } else if (currentChartPeriod === 'year') {
+                for (let i = 11; i >= 0; i--) {
+                    const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    const monthSessions = sessions.filter(s => {
+                        const sDate = new Date(s.date);
+                        return sDate.getMonth() === month.getMonth() && sDate.getFullYear() === month.getFullYear();
+                    });
+                    data.push({
+                        label: month.toLocaleDateString('en', { month: 'short' }),
+                        value: Math.floor(monthSessions.reduce((a, s) => a + s.duration, 0) / 60)
+                    });
+                }
+            }
+
+            const maxValue = Math.max(...data.map(d => d.value), 1);
+            
+            container.innerHTML = data.map(d => `
+                <div class="chart-bar" style="height: ${(d.value / maxValue * 100) || 5}%">
+                    <span class="value">${d.value}</span>
+                    <span class="label">${d.label}</span>
+                </div>
+            `).join('');
+        }
+
+        function setTaskFilter(period) {
+            currentTaskFilter = period;
+            const buttons = document.querySelectorAll('#dashboardPage .card:last-child .time-filter button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTaskList();
+        }
+
+        function renderTaskList() {
+            const sessions = getSessions();
+            const container = document.getElementById('taskList');
+            const now = new Date();
+            
+            let filteredSessions = [];
+            
+            if (currentTaskFilter === 'day') {
+                filteredSessions = sessions.filter(s => new Date(s.date).toDateString() === now.toDateString());
+            } else if (currentTaskFilter === 'week') {
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                filteredSessions = sessions.filter(s => new Date(s.date) >= weekAgo);
+            } else if (currentTaskFilter === 'month') {
+                const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                filteredSessions = sessions.filter(s => new Date(s.date) >= monthAgo);
+            } else if (currentTaskFilter === 'year') {
+                const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+                filteredSessions = sessions.filter(s => new Date(s.date) >= yearAgo);
+            }
+
+            filteredSessions = filteredSessions.slice(-10).reverse();
+
+            if (filteredSessions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        <p>No tasks completed yet. Start focusing!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredSessions.map(s => {
+                const date = new Date(s.date);
+                const duration = Math.floor(s.duration / 60);
+                return `
+                    <div class="task-item">
+                        <div class="task-icon">✓</div>
+                        <div class="task-info">
+                            <div class="task-name">${escapeHtml(s.task)}</div>
+                            <div class="task-meta">${date.toLocaleDateString()} at ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                        <div class="task-duration">${duration}m</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== SUBSCRIPTION ====================
+        function updateSubscriptionUI() {
+            const badge = document.getElementById('currentPlanBadge');
+            const name = document.getElementById('currentPlanName');
+            const desc = document.getElementById('currentPlanDesc');
+            
+            badge.className = 'plan-badge ' + userSubscription.plan;
+            badge.textContent = userSubscription.plan;
+            
+            if (userSubscription.plan === 'free') {
+                name.textContent = 'Free Plan';
+                desc.textContent = 'Basic focus timer with limited history';
+                document.getElementById('freePlanBtn').textContent = 'Current Plan';
+                document.getElementById('freePlanBtn').disabled = true;
+                document.getElementById('proPlanBtn').textContent = 'Upgrade to Pro';
+            } else if (userSubscription.plan === 'pro') {
+                name.textContent = 'Pro Plan';
+                desc.textContent = 'Unlimited access to all features';
+                document.getElementById('freePlanBtn').textContent = 'Downgrade';
+                document.getElementById('proPlanBtn').textContent = 'Current Plan';
+                document.getElementById('proPlanBtn').disabled = true;
+            }
+        }
+
+        function selectPlan(plan) {
+            if (plan === 'free') {
+                userSubscription = { plan: 'free', expiry: null };
+            } else if (plan === 'pro') {
+                userSubscription = { plan: 'pro', expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() };
+                
+                // Add billing record
+                const billing = JSON.parse(localStorage.getItem(`onething_billing_${currentUser.id}`) || '[]');
+                billing.push({
+                    date: new Date().toISOString(),
+                    description: 'Pro Plan - Monthly',
+                    amount: '$4.00',
+                    status: 'paid'
+                });
+                localStorage.setItem(`onething_billing_${currentUser.id}`, JSON.stringify(billing));
+                renderBillingHistory();
+            } else if (plan === 'team') {
+                alert('Please contact sales@onething.app for team plans');
+                return;
+            }
+            
+            localStorage.setItem(`onething_subscription_${currentUser.id}`, JSON.stringify(userSubscription));
+            updateSubscriptionUI();
+            document.getElementById('userPlan').textContent = userSubscription.plan === 'free' ? 'Free Plan' : 'Pro Plan';
+        }
+
+        function renderBillingHistory() {
+            const billing = JSON.parse(localStorage.getItem(`onething_billing_${currentUser.id}`) || '[]');
+            const tbody = document.getElementById('billingHistory');
+            
+            if (billing.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No billing history yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = billing.slice().reverse().map(b => `
+                <tr>
+                    <td>${new Date(b.date).toLocaleDateString()}</td>
+                    <td>${b.description}</td>
+                    <td>${b.amount}</td>
+                    <td><span class="status-badge ${b.status}">${b.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // ==================== PARKING LOT ====================
+        function handleParkingKeypress(event) {
+            if (event.key === 'Enter') {
+                const input = document.getElementById('parkingInput');
+                const text = input.value.trim();
+                if (text) {
+                    addParkingItem(text);
+                    input.value = '';
+                }
+            }
+        }
+
+        function addParkingItem(text) {
+            const items = getParkingItems();
+            // Limit for free plan
+            if (userSubscription.plan === 'free' && items.length >= 5) {
+                alert('Upgrade to Pro for unlimited parking lot items!');
+                return;
+            }
+            items.push({ text, id: Date.now() });
+            saveParkingItems(items);
+            renderParkingItems();
+        }
+
+        function removeParkingItem(id) {
+            const items = getParkingItems().filter(item => item.id !== id);
+            saveParkingItems(items);
+            renderParkingItems();
+        }
+
+        function getParkingItems() {
+            const userId = currentUser ? currentUser.id : 'guest';
+            return JSON.parse(localStorage.getItem(`onething_parking_${userId}`) || '[]');
+        }
+
+        function saveParkingItems(items) {
+            const userId = currentUser ? currentUser.id : 'guest';
+            localStorage.setItem(`onething_parking_${userId}`, JSON.stringify(items));
+        }
+
+        function loadParkingLot() {
+            renderParkingItems();
+        }
+
+        function renderParkingItems() {
+            const items = getParkingItems();
+            const container = document.getElementById('parkingItems');
+            if (container) {
+                container.innerHTML = items.map(item => `
+                    <div class="parking-item">
+                        ${escapeHtml(item.text)}
+                        <button onclick="removeParkingItem(${item.id})">×</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space' && document.getElementById('timerPage').classList.contains('active')) {
+                event.preventDefault();
+                if (!isRunning) startTimer();
+                else pauseTimer();
+            }
+            if (event.code === 'Escape' && document.getElementById('timerPage').classList.contains('active')) {
+                event.preventDefault();
+                resetTimer();
+            }
+        });
+    </script>
+</body>
+</html>
