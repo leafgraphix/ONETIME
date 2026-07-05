@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneThing — Focus | Clarity | Progress</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+    --gold: #c9a84c;
+    --gold-light: #e8d5a3;
+    --gold-dark: #8b7355;
+    --gold-muted: rgba(201,168,76,0.15);
+    --cream: #f5f0e8;
+    --charcoal: #1a1a1a;
+    --deep: #0d0d0d;
+    --glass: rgba(20,20,20,0.6);
+    --glass-border: rgba(201,168,76,0.12);
+    --text-primary: #e8e0d0;
+    --text-secondary: rgba(232,224,208,0.55);
+    --text-muted: rgba(232,224,208,0.3);
+    --shadow-gold: 0 0 40px rgba(201,168,76,0.08);
+    --timer-font: 'Cinzel', serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--deep);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+.bg-layer {
+    position: fixed; inset: 0; z-index: 0;
+    background-size: cover; background-position: center;
+    transition: opacity 1.5s ease; opacity: 0.35;
+}
+.bg-overlay {
+    position: fixed; inset: 0; z-index: 1;
+    background: linear-gradient(180deg, rgba(13,13,13,0.3) 0%, rgba(13,13,13,0.1) 30%, rgba(13,13,13,0.4) 70%, rgba(13,13,13,0.85) 100%);
+    pointer-events: none;
+}
+.particle {
+    position: fixed; width: 3px; height: 3px;
+    background: var(--gold); border-radius: 50%;
+    opacity: 0; z-index: 2; pointer-events: none;
+    animation: floatParticle 8s infinite ease-in-out;
+}
+@keyframes floatParticle {
+    0% { opacity: 0; transform: translateY(100vh) scale(0); }
+    20% { opacity: 0.6; }
+    80% { opacity: 0.4; }
+    100% { opacity: 0; transform: translateY(-20vh) scale(1.5); }
+}
+.app { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ===== LOGIN SCREEN ===== */
+.login-screen {
+    position: fixed; inset: 0; z-index: 1000;
+    background: var(--deep);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 32px;
+    padding: 40px 24px;
+    transition: opacity 0.6s ease, visibility 0.6s;
+}
+.login-screen.hidden {
+    opacity: 0; visibility: hidden; pointer-events: none;
+}
+.login-logo {
+    text-align: center;
+}
+.login-logo .logo-mark-lg {
+    width: 72px; height: 72px;
+    border: 2px solid var(--gold); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 32px; font-weight: 700;
+    color: var(--gold); margin: 0 auto 20px;
+    position: relative;
+}
+.login-logo .logo-mark-lg::after {
+    content: ''; position: absolute; inset: -6px;
+    border: 1px solid rgba(201,168,76,0.2); border-radius: 50%;
+}
+.login-logo h1 {
+    font-family: 'Cinzel', serif; font-size: 28px; letter-spacing: 6px;
+    color: var(--gold-light); margin-bottom: 8px;
+}
+.login-logo p {
+    font-family: 'Cormorant Garamond', serif; font-size: 15px;
+    font-style: italic; color: var(--text-secondary); letter-spacing: 2px;
+}
+.login-form {
+    width: 100%; max-width: 360px;
+    display: flex; flex-direction: column; gap: 16px;
+}
+.login-form input {
+    width: 100%; padding: 16px 20px;
+    font-family: 'Inter', sans-serif; font-size: 14px;
+    background: rgba(201,168,76,0.04); border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 14px; color: var(--gold-light); outline: none;
+    transition: all 0.3s;
+}
+.login-form input::placeholder { color: rgba(201,168,76,0.3); }
+.login-form input:focus {
+    border-color: var(--gold-dark);
+    box-shadow: 0 0 20px rgba(201,168,76,0.08);
+}
+.login-form button {
+    width: 100%; padding: 16px;
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(139,115,85,0.08));
+    border: 1px solid var(--gold-dark); border-radius: 14px;
+    color: var(--gold); cursor: pointer; transition: all 0.3s;
+}
+.login-form button:hover {
+    background: rgba(201,168,76,0.12);
+    box-shadow: 0 0 25px rgba(201,168,76,0.1);
+}
+.login-form .switch-text {
+    text-align: center; font-size: 12px; color: var(--text-muted);
+    cursor: pointer; transition: color 0.3s;
+}
+.login-form .switch-text:hover { color: var(--gold); }
+.login-form .switch-text span { color: var(--gold); text-decoration: underline; }
+
+/* ===== HEADER ===== */
+.header {
+    background: rgba(13,13,13,0.7); backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 14px 32px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+}
+.logo-group { display: flex; align-items: center; gap: 14px; }
+.logo-mark {
+    width: 40px; height: 40px; border: 1.5px solid var(--gold); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: var(--gold); position: relative;
+}
+.logo-mark::after { content: ''; position: absolute; inset: -4px; border: 1px solid rgba(201,168,76,0.2); border-radius: 50%; }
+.brand h1 { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600; letter-spacing: 4px; color: var(--gold-light); }
+.brand p { font-family: 'Cormorant Garamond', serif; font-size: 11px; font-style: italic; color: var(--text-secondary); letter-spacing: 2px; }
+.profile-trigger {
+    width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gold-dark);
+    background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(139,115,85,0.1));
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.4s ease; position: relative;
+}
+.profile-trigger:hover { border-color: var(--gold); box-shadow: 0 0 20px rgba(201,168,76,0.15); transform: scale(1.05); }
+.profile-trigger i { font-size: 16px; color: var(--gold); }
+.profile-trigger .status-dot { position: absolute; bottom: 2px; right: 2px; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); border: 2px solid var(--deep); }
+
+/* ===== PROFILE DROPDOWN ===== */
+.profile-dropdown {
+    position: fixed; top: 70px; right: 32px; width: 340px;
+    background: rgba(18,18,18,0.95); backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border); border-radius: 20px;
+    padding: 0; z-index: 200; display: none; overflow: hidden;
+    box-shadow: var(--shadow-gold), 0 20px 60px rgba(0,0,0,0.5);
+}
+.profile-dropdown.active { display: block; animation: reveal 0.4s ease; }
+@keyframes reveal { from { opacity: 0; transform: translateY(-12px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.profile-cover { height: 80px; background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(139,115,85,0.05)); position: relative; }
+.profile-avatar-lg {
+    width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--gold);
+    background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(139,115,85,0.1));
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; bottom: -32px; left: 24px; font-size: 24px; color: var(--gold);
+}
+.profile-body { padding: 44px 24px 24px; }
+.profile-name { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-light); margin-bottom: 2px; }
+.profile-level { font-family: 'Cormorant Garamond', serif; font-size: 13px; font-style: italic; color: var(--text-secondary); margin-bottom: 20px; }
+.profile-level.clickable { cursor: pointer; transition: color 0.3s; }
+.profile-level.clickable:hover { color: var(--gold); }
+.stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+.stat-item {
+    background: rgba(201,168,76,0.05); border: 1px solid rgba(201,168,76,0.08);
+    border-radius: 12px; padding: 14px; text-align: center; transition: all 0.3s;
+}
+.stat-item:hover { border-color: rgba(201,168,76,0.2); background: rgba(201,168,76,0.08); }
+.stat-item.clickable { cursor: pointer; }
+.stat-item.clickable:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,0.22); }
+.stat-value { font-family: 'Cinzel', serif; font-size: 22px; color: var(--gold); line-height: 1; }
+.stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px; }
+.meter-group { margin-bottom: 16px; }
+.meter-group.clickable { cursor: pointer; border-radius: 12px; padding: 8px; margin-left: -8px; margin-right: -8px; transition: all 0.3s; }
+.meter-group.clickable:hover { background: rgba(201,168,76,0.04); box-shadow: inset 0 0 0 1px rgba(201,168,76,0.08); }
+.meter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.meter-title { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; }
+.meter-value { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
+.meter-track { height: 5px; background: rgba(201,168,76,0.08); border-radius: 3px; overflow: hidden; position: relative; }
+.meter-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--gold-dark), var(--gold)); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+.meter-fill::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 20px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2)); }
+.profile-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--glass-border); }
+.p-action { background: transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 10px; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+.p-action:hover { border-color: var(--gold-dark); color: var(--gold-light); background: rgba(201,168,76,0.05); }
+.p-action i { font-size: 13px; width: 16px; text-align: center; }
+
+/* ===== MAIN ===== */
+.main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 40px 24px 32px; gap: 28px; }
+.task-wrap { width: 100%; max-width: 480px; position: relative; }
+.task-input {
+    width: 100%; padding: 18px 28px; font-family: 'Cinzel', serif; font-size: 15px; font-weight: 500;
+    letter-spacing: 3px; background: rgba(201,168,76,0.04); border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 16px; color: var(--gold-light); text-align: center; outline: none;
+    transition: all 0.4s; backdrop-filter: blur(10px);
+}
+.task-input::placeholder { color: rgba(201,168,76,0.3); font-weight: 400; }
+.task-input:focus { border-color: var(--gold-dark); box-shadow: 0 0 30px rgba(201,168,76,0.08); background: rgba(201,168,76,0.06); }
+
+.custom-timer-section { width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.timer-label { font-family: 'Cormorant Garamond', serif; font-size: 13px; font-style: italic; color: var(--text-secondary); letter-spacing: 3px; }
+.custom-inputs { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.time-field { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.time-field input { width: 70px; padding: 10px 8px; font-family: 'Cinzel', serif; font-size: 22px; color: var(--gold); background: rgba(201,168,76,0.05); border: 1px solid rgba(201,168,76,0.15); border-radius: 12px; text-align: center; outline: none; transition: all 0.3s; }
+.time-field input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(201,168,76,0.1); }
+.time-field label { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; }
+.time-sep { font-family: 'Cinzel', serif; font-size: 24px; color: var(--gold-dark); margin-top: -12px; }
+.set-custom-btn { background: transparent; border: 1px solid var(--gold-dark); color: var(--gold); padding: 8px 20px; border-radius: 20px; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; cursor: pointer; transition: all 0.3s; margin-top: 4px; }
+.set-custom-btn:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+
+.presets-wrap { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.preset-card {
+    width: 90px; background: rgba(201,168,76,0.03); border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 16px; padding: 16px 10px; cursor: pointer; transition: all 0.4s ease;
+    text-align: center; position: relative; overflow: hidden;
+}
+.preset-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0; transition: opacity 0.4s; }
+.preset-card:hover::before, .preset-card.active::before { opacity: 1; }
+.preset-card:hover, .preset-card.active { border-color: rgba(201,168,76,0.3); background: rgba(201,168,76,0.06); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 0 20px rgba(201,168,76,0.05); }
+.preset-card .p-icon { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(201,168,76,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 14px; color: var(--gold); transition: all 0.3s; }
+.preset-card:hover .p-icon, .preset-card.active .p-icon { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+.preset-card .p-hours { font-family: 'Cinzel', serif; font-size: 20px; color: var(--gold-light); line-height: 1; }
+.preset-card .p-unit { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.preset-card .p-skill { font-family: 'Cormorant Garamond', serif; font-size: 11px; font-style: italic; color: var(--text-muted); margin-top: 8px; line-height: 1.3; }
+
+.timer-display-wrap { position: relative; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.timer-ring-svg { position: absolute; width: 320px; height: 320px; }
+.timer-ring-svg circle { fill: none; stroke-width: 2; }
+.timer-ring-svg .ring-bg { stroke: rgba(201,168,76,0.06); }
+.timer-ring-svg .ring-progress { stroke: url(#goldGradient); stroke-linecap: round; transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset 1s linear; filter: drop-shadow(0 0 8px rgba(201,168,76,0.3)); }
+.timer-display { font-family: var(--timer-font); font-size: clamp(52px, 10vw, 90px); font-weight: 700; color: var(--cream); letter-spacing: 6px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); z-index: 2; display: flex; align-items: baseline; gap: 4px; }
+.timer-display .digit-group { display: flex; flex-direction: column; align-items: center; }
+.timer-display .digits { font-variant-numeric: tabular-nums; line-height: 1; }
+.timer-display .digit-label { font-family: 'Cormorant Garamond', serif; font-size: 10px; font-style: italic; color: var(--text-muted); letter-spacing: 3px; margin-top: 4px; text-transform: uppercase; }
+.timer-display .sep { font-size: 0.6em; color: var(--gold-dark); margin: 0 2px; align-self: flex-start; margin-top: 8px; animation: breathe 2s ease-in-out infinite; }
+@keyframes breathe { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+.controls { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.ctrl-btn { padding: 14px 32px; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600; letter-spacing: 3px; border: none; border-radius: 14px; cursor: pointer; transition: all 0.4s ease; text-transform: uppercase; position: relative; overflow: hidden; background: transparent; }
+.ctrl-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(139,115,85,0.05)); opacity: 0; transition: opacity 0.4s; }
+.ctrl-btn:hover::before { opacity: 1; }
+.ctrl-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+.ctrl-btn span { position: relative; z-index: 1; }
+.btn-start { border: 1px solid var(--gold); color: var(--gold); }
+.btn-start:hover { background: rgba(201,168,76,0.1); box-shadow: 0 0 30px rgba(201,168,76,0.1); }
+.btn-pause { border: 1px solid var(--gold-dark); color: var(--gold-light); }
+.btn-reset { border: 1px solid rgba(201,168,76,0.2); color: var(--text-secondary); }
+.btn-reset:hover { border-color: var(--gold-dark); color: var(--gold); }
+.btn-again { border: 1px solid rgba(201,168,76,0.2); color: var(--text-secondary); }
+.btn-again:hover { border-color: var(--gold-dark); color: var(--gold); }
+
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; width: 100%; max-width: 680px; }
+.feature {
+    background: rgba(201,168,76,0.03); border: 1px solid rgba(201,168,76,0.08);
+    border-radius: 18px; padding: 22px 16px; text-align: center; cursor: pointer;
+    transition: all 0.4s ease; position: relative; overflow: hidden;
+}
+.feature::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%) scaleX(0); width: 60%; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); transition: transform 0.4s ease; }
+.feature:hover::after { transform: translateX(-50%) scaleX(1); }
+.feature:hover { border-color: rgba(201,168,76,0.2); background: rgba(201,168,76,0.05); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
+.feature i { font-size: 22px; margin-bottom: 12px; display: block; color: var(--gold-dark); transition: color 0.3s; }
+.feature:hover i { color: var(--gold); }
+.feature h4 { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; margin-bottom: 6px; color: var(--gold-light); }
+.feature p { font-family: 'Cormorant Garamond', serif; font-size: 12px; font-style: italic; color: var(--text-muted); }
+
+.clock-widget { position: fixed; bottom: 24px; right: 24px; background: rgba(18,18,18,0.85); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 14px 20px; display: flex; align-items: center; gap: 14px; z-index: 50; box-shadow: var(--shadow-gold); }
+.clock-widget .indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--gold-dark); transition: all 0.5s; }
+.clock-widget .indicator.active { background: var(--gold); box-shadow: 0 0 10px rgba(201,168,76,0.5); animation: pulse-gold 2s infinite; }
+@keyframes pulse-gold { 0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(201,168,76,0.5); } 50% { opacity: 0.5; box-shadow: 0 0 2px rgba(201,168,76,0.2); } }
+.clock-widget .time-display { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-light); line-height: 1; }
+.clock-widget .time-ampm { font-family: 'Cormorant Garamond', serif; font-size: 11px; font-style: italic; color: var(--text-muted); }
+.clock-widget .focus-mini { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+
+.footer { text-align: center; padding: 24px; font-family: 'Cormorant Garamond', serif; font-size: 12px; font-style: italic; color: var(--text-muted); letter-spacing: 3px; }
+.footer span { color: var(--gold-dark); font-family: 'Cinzel', serif; font-style: normal; letter-spacing: 2px; }
+
+/* ===== MODALS ===== */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
+.modal-overlay.active { display: flex; opacity: 1; }
+.modal-box { background: rgba(18,18,18,0.97); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 32px; width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; transform: scale(0.95) translateY(10px); transition: transform 0.3s ease; box-shadow: 0 30px 80px rgba(0,0,0,0.5), var(--shadow-gold); }
+.modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
+.modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--glass-border); }
+.modal-head h2 { font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 3px; color: var(--gold-light); }
+.close-x { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; transition: color 0.3s; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.close-x:hover { color: var(--gold); background: rgba(201,168,76,0.05); }
+
+/* Music */
+.spotify-player { text-align: center; }
+.vinyl-container { width: 200px; height: 200px; margin: 0 auto 24px; position: relative; }
+.vinyl { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle at 50% 50%, #1a1a1a 8%, transparent 9%), repeating-radial-gradient(circle at 50% 50%, #222 0px, #1a1a1a 2px, #222 3px); border: 2px solid #333; position: relative; animation: vinylSpin 4s linear infinite; animation-play-state: paused; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.vinyl.playing { animation-play-state: running; }
+@keyframes vinylSpin { to { transform: rotate(360deg); } }
+.vinyl::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: linear-gradient(135deg, var(--gold-dark), var(--gold)); border-radius: 50%; }
+.vinyl::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: var(--deep); border-radius: 50%; }
+.track-info h3 { font-family: 'Cinzel', serif; font-size: 16px; color: var(--gold-light); margin-bottom: 4px; }
+.track-info p { font-family: 'Cormorant Garamond', serif; font-size: 13px; font-style: italic; color: var(--text-secondary); }
+.player-controls { display: flex; align-items: center; justify-content: center; gap: 24px; margin: 24px 0; }
+.player-btn { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; transition: all 0.3s; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.player-btn:hover { color: var(--gold); background: rgba(201,168,76,0.05); }
+.player-btn.main { font-size: 36px; color: var(--gold); }
+.player-btn.main:hover { transform: scale(1.1); }
+.progress-bar { height: 3px; background: rgba(201,168,76,0.1); border-radius: 2px; margin: 16px 0; position: relative; cursor: pointer; }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold-dark), var(--gold)); border-radius: 2px; position: relative; }
+.progress-fill::after { content: ''; position: absolute; right: -4px; top: -3px; width: 9px; height: 9px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px rgba(201,168,76,0.4); }
+.time-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: 'Cinzel', serif; }
+.spotify-note { color: var(--text-muted); font-family: 'Cormorant Garamond', serif; font-size: 13px; font-style: italic; line-height: 1.5; margin: 8px auto 0; max-width: 360px; }
+.spotify-connect-btn { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #1db954, #1ed760); color: white; border: none; padding: 12px 28px; border-radius: 30px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 16px; transition: all 0.3s; }
+.spotify-connect-btn:hover { transform: scale(1.03); box-shadow: 0 4px 20px rgba(29,185,84,0.3); }
+.playlist-list { margin-top: 24px; text-align: left; }
+.playlist-list h4 { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; }
+.pl-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+.pl-item:hover { background: rgba(201,168,76,0.05); }
+.pl-item i { color: var(--gold-dark); font-size: 14px; }
+.pl-item .pl-name { font-size: 13px; color: var(--text-primary); }
+.pl-item .pl-meta { font-size: 11px; color: var(--text-muted); }
+
+/* Calendar */
+.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.cal-nav button { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 8px; transition: all 0.2s; }
+.cal-nav button:hover { color: var(--gold); background: rgba(201,168,76,0.05); }
+.cal-nav h3 { font-family: 'Cinzel', serif; font-size: 15px; letter-spacing: 2px; color: var(--gold-light); }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 8px; text-align: center; }
+.cal-weekdays div { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 6px 0; }
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; font-size: 12px; cursor: pointer; transition: all 0.2s; position: relative; font-family: 'Cinzel', serif; }
+.cal-day:hover { background: rgba(201,168,76,0.05); }
+.cal-day.focus-day { background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05)); border: 1px solid rgba(201,168,76,0.2); color: var(--gold); }
+.cal-day.today { border: 1px solid var(--gold); color: var(--gold-light); }
+.cal-day .focus-hours { font-size: 8px; color: var(--gold); margin-top: 1px; font-family: 'Inter', sans-serif; }
+.cal-day.scheduled-day::after { content: ''; position: absolute; bottom: 6px; width: 4px; height: 4px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px rgba(201,168,76,0.6); }
+.cal-day.selected-day { background: rgba(201,168,76,0.12); border: 1px solid var(--gold-dark); color: var(--gold-light); }
+.schedule-panel { margin-top: 18px; padding: 16px; background: rgba(201,168,76,0.03); border: 1px solid rgba(201,168,76,0.08); border-radius: 14px; }
+.schedule-panel h4 { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 2px; color: var(--gold-light); margin-bottom: 12px; }
+.schedule-form { display: grid; grid-template-columns: 1fr 95px 95px auto; gap: 8px; align-items: center; }
+.schedule-form input { width: 100%; padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 12px; background: rgba(201,168,76,0.04); border: 1px solid rgba(201,168,76,0.14); border-radius: 10px; color: var(--gold-light); outline: none; }
+.schedule-form input:focus { border-color: var(--gold-dark); box-shadow: 0 0 15px rgba(201,168,76,0.08); }
+.schedule-form button { padding: 10px 14px; border-radius: 10px; border: 1px solid var(--gold-dark); background: transparent; color: var(--gold); cursor: pointer; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.3s; white-space: nowrap; }
+.schedule-form button:hover { background: rgba(201,168,76,0.08); border-color: var(--gold); }
+.schedule-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.schedule-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid rgba(201,168,76,0.08); border-radius: 10px; background: rgba(0,0,0,0.12); }
+.schedule-item-title { color: var(--gold-light); font-size: 12px; }
+.schedule-item-meta { color: var(--text-muted); font-size: 10px; margin-top: 2px; }
+.schedule-delete { border: none; background: transparent; color: var(--text-muted); cursor: pointer; padding: 6px; transition: color 0.2s; }
+.schedule-delete:hover { color: var(--gold); }
+
+/* Focus Stats */
+.focus-ring-wrap { width: 160px; height: 160px; margin: 0 auto 24px; position: relative; }
+.focus-ring-wrap svg { transform: rotate(-90deg); }
+.focus-ring-wrap .f-bg { fill: none; stroke: rgba(201,168,76,0.08); stroke-width: 10; }
+.focus-ring-wrap .f-progress { fill: none; stroke: url(#goldGradient); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 377; }
+.focus-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.focus-center .score { font-family: 'Cinzel', serif; font-size: 32px; color: var(--gold); }
+.focus-center .score-label { font-family: 'Cormorant Garamond', serif; font-size: 11px; font-style: italic; color: var(--text-muted); }
+.period-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+.period-card { background: rgba(201,168,76,0.04); border: 1px solid rgba(201,168,76,0.08); border-radius: 12px; padding: 14px 8px; text-align: center; }
+.period-card .p-val { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold); }
+.period-card .p-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.weekly-bars { display: flex; align-items: flex-end; gap: 8px; height: 100px; padding: 10px 0 24px; margin: 16px 0; }
+.w-bar { flex: 1; background: linear-gradient(to top, rgba(201,168,76,0.3), rgba(201,168,76,0.6)); border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.6s ease; position: relative; }
+.w-bar::after { content: attr(data-day); position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--text-muted); font-family: 'Cinzel', serif; }
+.w-bar:hover { background: linear-gradient(to top, rgba(201,168,76,0.5), var(--gold)); }
+.assessment-box { background: rgba(201,168,76,0.03); border: 1px solid rgba(201,168,76,0.08); border-radius: 14px; padding: 18px; margin-top: 16px; }
+.assessment-box h4 { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 2px; color: var(--gold-light); margin-bottom: 10px; }
+.assessment-box p { font-family: 'Cormorant Garamond', serif; font-size: 13px; line-height: 1.7; color: var(--text-secondary); font-style: italic; }
+.assessment-box p strong { color: var(--gold); font-style: normal; font-family: 'Cinzel', serif; font-size: 12px; }
+
+/* Themes */
+.theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.theme-opt { aspect-ratio: 16/10; border-radius: 14px; cursor: pointer; border: 2px solid transparent; transition: all 0.3s; position: relative; overflow: hidden; background-size: cover; background-position: center; }
+.theme-opt::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); }
+.theme-opt:hover { transform: scale(1.02); }
+.theme-opt.active { border-color: var(--gold); }
+.theme-opt .t-name { position: absolute; bottom: 10px; left: 12px; z-index: 2; font-family: 'Cinzel', serif; font-size: 12px; color: var(--cream); text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+.theme-opt .t-check { position: absolute; top: 8px; right: 8px; z-index: 2; color: var(--gold); font-size: 14px; opacity: 0; transition: opacity 0.3s; }
+.theme-opt.active .t-check { opacity: 1; }
+.settings-section { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--glass-border); }
+.settings-section h4 { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase; }
+.font-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.font-opt { background: rgba(201,168,76,0.03); border: 1px solid rgba(201,168,76,0.1); border-radius: 12px; color: var(--text-secondary); padding: 12px; cursor: pointer; transition: all 0.25s; text-align: left; }
+.font-opt:hover, .font-opt.active { border-color: var(--gold-dark); background: rgba(201,168,76,0.07); color: var(--gold-light); }
+.font-opt .font-preview { display: block; color: var(--gold); font-size: 22px; line-height: 1; margin-bottom: 6px; }
+.font-opt .font-name { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* Toasts */
+.toast-container { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 400; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { background: rgba(18,18,18,0.95); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-left: 3px solid var(--gold); border-radius: 12px; padding: 14px 22px; display: flex; align-items: center; gap: 12px; animation: toastIn 0.4s ease, toastOut 0.4s ease 3.5s forwards; box-shadow: 0 10px 30px rgba(0,0,0,0.3); pointer-events: all; font-size: 13px; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(-16px); } }
+
+/* Session History inside profile */
+.history-list { max-height: 200px; overflow-y: auto; margin-top: 12px; }
+.history-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 12px; border-radius: 8px; font-size: 12px;
+    border-bottom: 1px solid rgba(201,168,76,0.05);
+}
+.history-item:hover { background: rgba(201,168,76,0.03); }
+.history-item .h-task { color: var(--text-secondary); font-style: italic; }
+.history-item .h-time { font-family: 'Cinzel', serif; color: var(--gold); font-size: 11px; }
+.history-item .h-date { color: var(--text-muted); font-size: 10px; }
+
+@media (max-width: 600px) {
+    .header { padding: 12px 16px; }
+    .timer-display { font-size: 44px; letter-spacing: 3px; }
+    .timer-ring-svg { width: 260px; height: 260px; }
+    .features { grid-template-columns: repeat(2, 1fr); }
+    .profile-dropdown { right: 10px; width: calc(100vw - 20px); max-width: 340px; }
+    .clock-widget { bottom: 12px; right: 12px; padding: 10px 14px; }
+    .presets-wrap { gap: 10px; }
+    .preset-card { width: 80px; padding: 12px 8px; }
+    .schedule-form { grid-template-columns: 1fr; }
+    .login-logo h1 { font-size: 22px; }
+}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.15); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-logo">
+        <div class="logo-mark-lg">1</div>
+        <h1>ONETHING</h1>
+        <p>Your personal focus sanctuary</p>
+    </div>
+    <div class="login-form" id="loginForm">
+        <input type="text" id="loginName" placeholder="Your Name" autocomplete="name">
+        <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
+        <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
+        <button onclick="handleLogin()" id="loginBtn">Enter Your Space</button>
+        <div class="switch-text" id="loginSwitch">
+            New here? <span onclick="toggleAuthMode()">Create an account</span>
+        </div>
+    </div>
+</div>
+
+<!-- BACKGROUND -->
+<div class="bg-layer active" id="bgLayer" style="background-image:url('Copilot_20260627_100934.png')"></div>
+<div class="bg-overlay"></div>
+<div id="particles"></div>
+
+<div class="app" id="mainApp" style="display:none;">
+
+<header class="header">
+    <div class="logo-group">
+        <div class="logo-mark">1</div>
+        <div class="brand">
+            <h1>ONETHING</h1>
+            <p>Focus &middot; Clarity &middot; Progress</p>
+        </div>
+    </div>
+    <button class="profile-trigger" onclick="toggleProfile()" title="Profile">
+        <i class="fas fa-user"></i>
+        <div class="status-dot" id="profileDot"></div>
+    </button>
+</header>
+
+<!-- PROFILE DROPDOWN -->
+<div class="profile-dropdown" id="profileDropdown">
+    <div class="profile-cover"></div>
+    <div class="profile-avatar-lg"><i class="fas fa-user"></i></div>
+    <div class="profile-body">
+        <div class="profile-name" id="profileNameDisplay">User</div>
+        <div class="profile-level clickable" id="profileLevelDisplay" onclick="openFocusInsights()">Focus Beginner &middot; Level 1</div>
+        <div class="stats-row">
+            <div class="stat-item"><div class="stat-value" id="pTotalHours">0.0</div><div class="stat-label">Total Hours</div></div>
+            <div class="stat-item"><div class="stat-value" id="pSessions">0</div><div class="stat-label">Sessions</div></div>
+            <div class="stat-item clickable" onclick="openFocusInsights()"><div class="stat-value" id="pAvgFocus">0%</div><div class="stat-label">Avg Focus</div></div>
+            <div class="stat-item"><div class="stat-value" id="pStreak">0</div><div class="stat-label">Day Streak</div></div>
+        </div>
+        <div class="meter-group clickable" onclick="openFocusInsights()">
+            <div class="meter-header"><span class="meter-title">Focus Capability</span><span class="meter-value" id="capValue">0%</span></div>
+            <div class="meter-track"><div class="meter-fill" id="capFill" style="width:0%"></div></div>
+        </div>
+        <div class="meter-group">
+            <div class="meter-header"><span class="meter-title">Study Consistency</span><span class="meter-value" id="conValue">0%</span></div>
+            <div class="meter-track"><div class="meter-fill" id="conFill" style="width:0%;background:linear-gradient(90deg,var(--gold-dark),#a08050)"></div></div>
+        </div>
+        <div class="meter-group">
+            <div class="meter-header"><span class="meter-title">Deep Work Ratio</span><span class="meter-value" id="deepValue">0%</span></div>
+            <div class="meter-track"><div class="meter-fill" id="deepFill" style="width:0%;background:linear-gradient(90deg,#5a4a3a,var(--gold-dark))"></div></div>
+        </div>
+        <div class="profile-actions">
+            <button class="p-action" onclick="showHistory()"><i class="fas fa-history"></i> Session History</button>
+            <button class="p-action" onclick="exportData()"><i class="fas fa-download"></i> Export Data</button>
+            <button class="p-action" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+        </div>
+        <div class="history-list" id="historyList" style="display:none;"></div>
+    </div>
+</div>
+
+<main class="main">
+    <div class="task-wrap">
+        <input type="text" class="task-input" id="taskInput" placeholder="WHAT IS YOUR ONE THING?" maxlength="60">
+    </div>
+    <div class="custom-timer-section">
+        <div class="timer-label">Set Your Focus Duration</div>
+        <div class="custom-inputs">
+            <div class="time-field"><input type="number" id="customH" min="0" max="99" value="00" onfocus="this.select()"><label>Hours</label></div>
+            <span class="time-sep">:</span>
+            <div class="time-field"><input type="number" id="customM" min="0" max="59" value="25" onfocus="this.select()"><label>Minutes</label></div>
+            <span class="time-sep">:</span>
+            <div class="time-field"><input type="number" id="customS" min="0" max="59" value="00" onfocus="this.select()"><label>Seconds</label></div>
+        </div>
+        <button class="set-custom-btn" onclick="applyCustomTime()">Apply Custom Time</button>
+    </div>
+    <div class="presets-wrap">
+        <div class="preset-card" onclick="setPreset(0.5,this)" data-preset="0.5">
+            <div class="p-icon"><i class="fas fa-bolt"></i></div><div class="p-hours">30</div><div class="p-unit">min</div><div class="p-skill">Quick Sprint<br>High Intensity</div>
+        </div>
+        <div class="preset-card" onclick="setPreset(1,this)" data-preset="1">
+            <div class="p-icon"><i class="fas fa-seedling"></i></div><div class="p-hours">1</div><div class="p-unit">hour</div><div class="p-skill">Deep Work<br>Full Concentration</div>
+        </div>
+        <div class="preset-card active" onclick="setPreset(2,this)" data-preset="2">
+            <div class="p-icon"><i class="fas fa-mountain"></i></div><div class="p-hours">2</div><div class="p-unit">hours</div><div class="p-skill">Marathon Mode<br>Endurance Build</div>
+        </div>
+        <div class="preset-card" onclick="setPreset(4,this)" data-preset="4">
+            <div class="p-icon"><i class="fas fa-crown"></i></div><div class="p-hours">4</div><div class="p-unit">hours</div><div class="p-skill">Master Session<br>Peak Performance</div>
+        </div>
+        <div class="preset-card" onclick="setPreset(8,this)" data-preset="8">
+            <div class="p-icon"><i class="fas fa-infinity"></i></div><div class="p-hours">8</div><div class="p-unit">hours</div><div class="p-skill">Full Day Flow<br>Legendary Focus</div>
+        </div>
+    </div>
+    <div class="timer-display-wrap">
+        <svg class="timer-ring-svg" viewBox="0 0 320 320">
+            <defs><linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#8b7355"/><stop offset="50%" style="stop-color:#c9a84c"/><stop offset="100%" style="stop-color:#e8d5a3"/></linearGradient></defs>
+            <circle class="ring-bg" cx="160" cy="160" r="150"/>
+            <circle class="ring-progress" id="progressRing" cx="160" cy="160" r="150" stroke-dasharray="942.48" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-display" id="timerDisplay">
+            <div class="digit-group"><span class="digits" id="dispH">02</span><span class="digit-label">Hours</span></div>
+            <span class="sep">:</span>
+            <div class="digit-group"><span class="digits" id="dispM">00</span><span class="digit-label">Minutes</span></div>
+            <span class="sep">:</span>
+            <div class="digit-group"><span class="digits" id="dispS">00</span><span class="digit-label">Seconds</span></div>
+        </div>
+    </div>
+    <div class="controls">
+        <button class="ctrl-btn btn-again" onclick="againTimer()"><span><i class="fas fa-redo"></i> Again</span></button>
+        <button class="ctrl-btn btn-start" id="startBtn" onclick="toggleTimer()"><span><i class="fas fa-play"></i> Start</span></button>
+        <button class="ctrl-btn btn-reset" onclick="resetTimer()"><span><i class="fas fa-undo"></i> Reset</span></button>
+    </div>
+    <div class="features">
+        <div class="feature" onclick="openModal('musicModal')"><i class="fas fa-compact-disc"></i><h4>Music</h4><p>Spotify Integration</p></div>
+        <div class="feature" onclick="openModal('calendarModal')"><i class="fas fa-calendar-alt"></i><h4>Schedule</h4><p>Focus Calendar</p></div>
+        <div class="feature" onclick="openModal('focusModal')"><i class="fas fa-chart-pie"></i><h4>Analytics</h4><p>Focus Insights</p></div>
+        <div class="feature" onclick="openModal('themeModal')"><i class="fas fa-image"></i><h4>Ambience</h4><p>Change Atmosphere</p></div>
+    </div>
+</main>
+
+<footer class="footer">ONETHING TIMER &mdash; CRAFTED BY <span>LEAFGRAPHIX</span></footer>
+</div>
+
+<div class="clock-widget">
+    <div class="indicator" id="focusIndicator"></div>
+    <div><div class="time-display" id="clockTime">00:00</div><div class="time-ampm" id="clockAmPm">AM</div></div>
+    <div class="focus-mini" id="focusStatus">Ready</div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MUSIC MODAL -->
+<div class="modal-overlay" id="musicModal">
+<div class="modal-box">
+<div class="modal-head"><h2><i class="fas fa-music" style="color:var(--gold);margin-right:10px;"></i>Focus Music</h2><button class="close-x" onclick="closeModal('musicModal')"><i class="fas fa-times"></i></button></div>
+<div class="spotify-player">
+    <div class="vinyl-container"><div class="vinyl" id="vinyl"></div></div>
+    <div class="track-info"><h3 id="trackTitle">Deep Focus</h3><p id="trackArtist">Instrumental Study Music</p></div>
+    <div class="progress-bar" onclick="seekTrack(event)"><div class="progress-fill" id="trackProgress"></div></div>
+    <div class="time-labels"><span id="trackCurrent">0:00</span><span id="trackTotal">3:45</span></div>
+    <div class="player-controls">
+        <button class="player-btn" onclick="prevTrack()"><i class="fas fa-step-backward"></i></button>
+        <button class="player-btn main" onclick="togglePlay()" id="mainPlayBtn"><i class="fas fa-play-circle" id="playIcon"></i></button>
+        <button class="player-btn" onclick="nextTrack()"><i class="fas fa-step-forward"></i></button>
+    </div>
+    <p class="spotify-note">Preview the vibe here, or open the selected playlist/search in Spotify for real playback.</p>
+    <button class="spotify-connect-btn" onclick="connectSpotify()"><i class="fab fa-spotify"></i> Open in Spotify</button>
+    <div class="playlist-list">
+        <h4>Recommended Playlists</h4>
+        <div class="pl-item" onclick="loadPlaylist('Deep Focus')"><i class="fas fa-headphones"></i><div><div class="pl-name">Deep Focus</div><div class="pl-meta">Instrumental - 3h 24m</div></div></div>
+        <div class="pl-item" onclick="loadPlaylist('Lo-Fi Study')"><i class="fas fa-headphones"></i><div><div class="pl-name">Lo-Fi Study</div><div class="pl-meta">Chill beats - 2h 15m</div></div></div>
+        <div class="pl-item" onclick="loadPlaylist('Brain Waves')"><i class="fas fa-headphones"></i><div><div class="pl-name">Brain Waves</div><div class="pl-meta">Binaural beats - 1h 30m</div></div></div>
+        <div class="pl-item" onclick="loadPlaylist('Classical Focus')"><i class="fas fa-headphones"></i><div><div class="pl-name">Classical Focus</div><div class="pl-meta">Piano & Strings - 4h 00m</div></div></div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- CALENDAR MODAL -->
+<div class="modal-overlay" id="calendarModal">
+<div class="modal-box">
+<div class="modal-head"><h2><i class="fas fa-calendar" style="color:var(--gold);margin-right:10px;"></i>Focus Calendar</h2><button class="close-x" onclick="closeModal('calendarModal')"><i class="fas fa-times"></i></button></div>
+<div class="cal-nav"><button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button><h3 id="calMonthTitle">June 2026</h3><button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button></div>
+<div class="cal-weekdays"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+<div class="cal-days" id="calDays"></div>
+<div class="schedule-panel">
+    <h4 id="scheduleDateTitle">Click a date to schedule focus</h4>
+    <div class="schedule-form">
+        <input type="text" id="scheduleTask" placeholder="What will you focus on?">
+        <input type="time" id="scheduleTime" value="09:00">
+        <input type="number" id="scheduleDuration" min="5" max="720" step="5" value="60" placeholder="Minutes">
+        <button onclick="addScheduleItem()"><i class="fas fa-plus"></i> Add</button>
+    </div>
+    <div class="schedule-list" id="scheduleList"></div>
+</div>
+<div style="margin-top:24px;padding:16px;background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.08);border-radius:14px;">
+    <h4 style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:var(--gold-light);margin-bottom:12px;">This Month Summary</h4>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+        <div style="text-align:center;"><div style="font-family:'Cinzel',serif;font-size:20px;color:var(--gold;" id="monthHours">0.0</div><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Hours</div></div>
+        <div style="text-align:center;"><div style="font-family:'Cinzel',serif;font-size:20px;color:var(--gold;" id="monthDays">0</div><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Active Days</div></div>
+        <div style="text-align:center;"><div style="font-family:'Cinzel',serif;font-size:20px;color:var(--gold;" id="monthAvg">0.0</div><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Daily Avg</div></div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- FOCUS STATS MODAL -->
+<div class="modal-overlay" id="focusModal">
+<div class="modal-box">
+<div class="modal-head"><h2><i class="fas fa-chart-line" style="color:var(--gold);margin-right:10px;"></i>Focus Analytics</h2><button class="close-x" onclick="closeModal('focusModal')"><i class="fas fa-times"></i></button></div>
+<div class="focus-ring-wrap">
+    <svg width="160" height="160" viewBox="0 0 160 160">
+        <defs><linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#8b7355"/><stop offset="100%" style="stop-color:#c9a84c"/></linearGradient></defs>
+        <circle class="f-bg" cx="80" cy="80" r="60"/>
+        <circle class="f-progress" id="focusRingProgress" cx="80" cy="80" r="60" stroke-dashoffset="377"/>
+    </svg>
+    <div class="focus-center"><div class="score" id="focusScore">0%</div><div class="score-label">Focus Score</div></div>
+</div>
+<div class="period-stats">
+    <div class="period-card"><div class="p-val" id="todayHours">0.0</div><div class="p-label">Today</div></div>
+    <div class="period-card"><div class="p-val" id="weekHours">0.0</div><div class="p-label">This Week</div></div>
+    <div class="period-card"><div class="p-val" id="monthTotalHours">0.0</div><div class="p-label">This Month</div></div>
+</div>
+<div><h4 style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:var(--gold-light);margin-bottom:10px;text-align:center;">Weekly Focus Hours</h4><div class="weekly-bars" id="weeklyBars"></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+    <div class="period-card"><div class="p-val" id="bestStreakVal">0</div><div class="p-label">Best Streak</div></div>
+    <div class="period-card"><div class="p-val" id="totalFocusVal">0.0h</div><div class="p-label">All Time</div></div>
+</div>
+<div class="assessment-box">
+    <h4>Student Assessment</h4>
+    <p id="assessmentText">Start your first focus session to see your personalized assessment.</p>
+</div>
+</div>
+</div>
+
+<!-- THEME MODAL -->
+<div class="modal-overlay" id="themeModal">
+<div class="modal-box">
+<div class="modal-head"><h2><i class="fas fa-image" style="color:var(--gold);margin-right:10px;"></i>Ambience</h2><button class="close-x" onclick="closeModal('themeModal')"><i class="fas fa-times"></i></button></div>
+<div class="theme-grid">
+    <div class="theme-opt active" onclick="setTheme(0,this)" style="background-image:url('Copilot_20260627_100934.png')">
+        <div class="t-name">Midnight Rain</div><div class="t-check"><i class="fas fa-check"></i></div>
+    </div>
+    <div class="theme-opt" onclick="setTheme(1,this)" style="background-image:url('Copilot_20260627_100847.png')">
+        <div class="t-name">Golden Sunset</div><div class="t-check"><i class="fas fa-check"></i></div>
+    </div>
+    <div class="theme-opt" onclick="setTheme(2,this)" style="background-image:url('Copilot_20260627_101126.png')">
+        <div class="t-name">Morning Calm</div><div class="t-check"><i class="fas fa-check"></i></div>
+    </div>
+    <div class="theme-opt" onclick="setTheme(3,this)" style="background-image:url('Copilot_20260627_101233.png')">
+        <div class="t-name">Cozy Studio</div><div class="t-check"><i class="fas fa-check"></i></div>
+    </div>
+</div>
+<div class="settings-section">
+    <h4>Timer Font</h4>
+    <div class="font-grid">
+        <button class="font-opt active" onclick="setTimerFont(0,this)"><span class="font-preview" style="font-family:'Cinzel',serif;">02:00</span><span class="font-name">Classic</span></button>
+        <button class="font-opt" onclick="setTimerFont(1,this)"><span class="font-preview" style="font-family:'Inter',sans-serif;">02:00</span><span class="font-name">Clean</span></button>
+        <button class="font-opt" onclick="setTimerFont(2,this)"><span class="font-preview" style="font-family:'Cormorant Garamond',serif;">02:00</span><span class="font-name">Elegant</span></button>
+        <button class="font-opt" onclick="setTimerFont(3,this)"><span class="font-preview" style="font-family:Georgia,serif;">02:00</span><span class="font-name">Bookish</span></button>
+    </div>
+</div>
+</div>
+</div>
+
+<script>
+// ===================== AUTH SYSTEM =====================
+let currentUser = null;
+let isSignup = false;
+
+function toggleAuthMode(){
+    isSignup = !isSignup;
+    const btn = document.getElementById('loginBtn');
+    const switchText = document.getElementById('loginSwitch');
+    if(isSignup){
+        btn.textContent = 'Create Account';
+        switchText.innerHTML = 'Already have an account? <span onclick="toggleAuthMode()">Log in</span>';
+    } else {
+        btn.textContent = 'Enter Your Space';
+        switchText.innerHTML = 'New here? <span onclick="toggleAuthMode()">Create an account</span>';
+    }
+}
+
+function handleLogin(){
+    const name = document.getElementById('loginName').value.trim();
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value.trim();
+    if(!name || !user || !pass){
+        showToast('Please fill in all fields','warning');
+        return;
+    }
+    if(isSignup){
+        // Create new account
+        if(localStorage.getItem('onething_user_'+user)){
+            showToast('Username already exists','warning');
+            return;
+        }
+        const newUser = createNewUser(name, user, pass);
+        localStorage.setItem('onething_user_'+user, JSON.stringify(newUser));
+        localStorage.setItem('onething_current', user);
+        currentUser = newUser;
+        showToast('Account created! Welcome, '+name,'success');
+    } else {
+        // Login
+        const stored = localStorage.getItem('onething_user_'+user);
+        if(!stored){
+            showToast('User not found. Create an account first.','warning');
+            return;
+        }
+        const parsed = JSON.parse(stored);
+        if(parsed.password !== pass){
+            showToast('Incorrect password','warning');
+            return;
+        }
+        currentUser = parsed;
+        localStorage.setItem('onething_current', user);
+        showToast('Welcome back, '+parsed.name+'!','success');
+    }
+    enterApp();
+}
+
+function createNewUser(name, username, password){
+    return {
+        name: name,
+        username: username,
+        password: password,
+        createdAt: new Date().toISOString(),
+        totalHours: 0,
+        sessions: 0,
+        avgFocus: 0,
+        streak: 0,
+        bestStreak: 0,
+        focusCapability: 10,
+        consistency: 10,
+        deepWork: 5,
+        todayHours: 0,
+        weekHours: 0,
+        monthHours: 0,
+        allTime: 0,
+        lastSessionDate: null,
+        currentStreak: 0,
+        focusData: {}, // date -> hours
+        scheduleData: {}, // date -> scheduled focus blocks
+        weeklyData: [0,0,0,0,0,0,0],
+        sessionHistory: [],
+        theme: 0,
+        timerFont: 0
+    };
+}
+
+function normalizeUserData(){
+    if(!currentUser) return;
+    if(!currentUser.focusData) currentUser.focusData = {};
+    if(!currentUser.scheduleData) currentUser.scheduleData = {};
+    if(!currentUser.weeklyData) currentUser.weeklyData = [0,0,0,0,0,0,0];
+    if(!currentUser.sessionHistory) currentUser.sessionHistory = [];
+    if(currentUser.theme === undefined) currentUser.theme = 0;
+    if(currentUser.timerFont === undefined) currentUser.timerFont = 0;
+}
+
+function enterApp(){
+    normalizeUserData();
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').style.display = 'flex';
+    updateProfileUI();
+    renderCalendar();
+    renderWeeklyBars();
+    updateDisplay();
+    applyTheme(currentUser.theme || 0, false);
+    applyTimerFont(currentUser.timerFont || 0, false);
+}
+
+function logout(){
+    localStorage.removeItem('onething_current');
+    currentUser = null;
+    location.reload();
+}
+
+function saveUser(){
+    if(currentUser){
+        localStorage.setItem('onething_user_'+currentUser.username, JSON.stringify(currentUser));
+    }
+}
+
+// Check for existing session
+function checkAutoLogin(){
+    const saved = localStorage.getItem('onething_current');
+    if(saved){
+        const stored = localStorage.getItem('onething_user_'+saved);
+        if(stored){
+            currentUser = JSON.parse(stored);
+            enterApp();
+            return true;
+        }
+    }
+    return false;
+}
+
+// ===================== GOLD PARTICLES =====================
+const particleContainer = document.getElementById('particles');
+for(let i=0; i<30; i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.animationDelay = Math.random()*8 + 's';
+    p.style.animationDuration = (6+Math.random()*6) + 's';
+    particleContainer.appendChild(p);
+}
+
+// ===================== TIMER STATE =====================
+let totalSeconds = 2*3600;
+let remainingSeconds = totalSeconds;
+let isRunning = false;
+let timerInterval = null;
+let currentPreset = 2;
+let sessionStartTime = null;
+
+function formatTime(seconds){
+    const h = Math.floor(seconds/3600);
+    const m = Math.floor((seconds%3600)/60);
+    const s = seconds%60;
+    return {h:String(h).padStart(2,'0'),m:String(m).padStart(2,'0'),s:String(s).padStart(2,'0')};
+}
+
+function updateDisplay(){
+    const t = formatTime(remainingSeconds);
+    document.getElementById('dispH').textContent = t.h;
+    document.getElementById('dispM').textContent = t.m;
+    document.getElementById('dispS').textContent = t.s;
+    const circumference = 2*Math.PI*150;
+    const offset = circumference*(1 - remainingSeconds/totalSeconds);
+    document.getElementById('progressRing').style.strokeDashoffset = offset;
+}
+
+function applyCustomTime(){
+    if(isRunning){ showToast('Pause timer first','warning'); return; }
+    const h = parseInt(document.getElementById('customH').value)||0;
+    const m = parseInt(document.getElementById('customM').value)||0;
+    const s = parseInt(document.getElementById('customS').value)||0;
+    if(h===0 && m===0 && s===0){ showToast('Please enter a valid time','warning'); return; }
+    totalSeconds = h*3600 + m*60 + s;
+    remainingSeconds = totalSeconds;
+    currentPreset = null;
+    document.querySelectorAll('.preset-card').forEach(c=>c.classList.remove('active'));
+    updateDisplay();
+    showToast(`Timer set to ${h}h ${m}m ${s}s`,'success');
+}
+
+function setPreset(hours, btn){
+    if(isRunning){ showToast('Pause timer first','warning'); return; }
+    currentPreset = hours;
+    totalSeconds = Math.round(hours*3600);
+    remainingSeconds = totalSeconds;
+    updateDisplay();
+    document.querySelectorAll('.preset-card').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const h = Math.floor(hours);
+    const m = Math.round((hours-h)*60);
+    document.getElementById('customH').value = String(h).padStart(2,'0');
+    document.getElementById('customM').value = String(m).padStart(2,'0');
+    document.getElementById('customS').value = '00';
+    showToast(`Preset: ${hours>=1?hours+' hours':(hours*60)+' minutes'}`,'success');
+}
+
+function toggleTimer(){
+    const btn = document.getElementById('startBtn');
+    const indicator = document.getElementById('focusIndicator');
+    const status = document.getElementById('focusStatus');
+    if(isRunning){
+        clearInterval(timerInterval);
+        isRunning = false;
+        btn.innerHTML = '<span><i class="fas fa-play"></i> Start</span>';
+        btn.className = 'ctrl-btn btn-start';
+        indicator.classList.remove('active');
+        status.textContent = 'Paused';
+        showToast('Timer paused','info');
+        if(sessionStartTime){
+            const elapsed = Math.floor((Date.now()-sessionStartTime)/1000);
+            if(elapsed > 60) recordSession(elapsed);
+        }
+    } else {
+        if(remainingSeconds<=0) remainingSeconds = totalSeconds;
+        isRunning = true;
+        sessionStartTime = Date.now();
+        btn.innerHTML = '<span><i class="fas fa-pause"></i> Pause</span>';
+        btn.className = 'ctrl-btn btn-pause';
+        indicator.classList.add('active');
+        status.textContent = 'Focusing';
+        showToast('Focus session started','success');
+        timerInterval = setInterval(()=>{
+            remainingSeconds--;
+            updateDisplay();
+            if(remainingSeconds<=0){
+                clearInterval(timerInterval);
+                isRunning = false;
+                btn.innerHTML = '<span><i class="fas fa-play"></i> Start</span>';
+                btn.className = 'ctrl-btn btn-start';
+                indicator.classList.remove('active');
+                status.textContent = 'Completed';
+                showToast('Session complete! Excellent work.','success');
+                recordSession(totalSeconds);
+                playChime();
+            }
+        },1000);
+    }
+}
+
+function recordSession(elapsedSeconds){
+    if(!currentUser) return;
+    const elapsedHours = elapsedSeconds/3600;
+    const task = document.getElementById('taskInput').value || 'Unnamed Session';
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+
+    // Update basic stats
+    currentUser.totalHours += elapsedHours;
+    currentUser.sessions++;
+    currentUser.allTime += elapsedHours;
+    currentUser.todayHours += elapsedHours;
+    currentUser.weekHours += elapsedHours;
+    currentUser.monthHours += elapsedHours;
+
+    // Update focus data for calendar
+    if(!currentUser.focusData[today]) currentUser.focusData[today] = 0;
+    currentUser.focusData[today] += elapsedHours;
+
+    // Update weekly data
+    const dayIdx = now.getDay(); // 0=Sun, 1=Mon...
+    const weekIdx = dayIdx === 0 ? 6 : dayIdx - 1; // Mon=0, Sun=6
+    currentUser.weeklyData[weekIdx] += elapsedHours;
+
+    // Streak logic
+    const lastDate = currentUser.lastSessionDate;
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    const yestStr = yesterday.toISOString().split('T')[0];
+
+    if(lastDate === today){
+        // Same day, streak continues
+    } else if(lastDate === yestStr){
+        currentUser.currentStreak++;
+    } else if(lastDate !== today){
+        currentUser.currentStreak = 1;
+    }
+    currentUser.lastSessionDate = today;
+    if(currentUser.currentStreak > currentUser.bestStreak){
+        currentUser.bestStreak = currentUser.currentStreak;
+    }
+    currentUser.streak = currentUser.currentStreak;
+
+    // Update capability metrics
+    const sessionQuality = Math.min(elapsedHours / 2, 1); // 2h = max quality
+    currentUser.focusCapability = Math.min(95, currentUser.focusCapability + (sessionQuality * 2));
+    currentUser.consistency = Math.min(95, currentUser.consistency + (sessionQuality * 1.5));
+    if(elapsedHours >= 1.5){
+        currentUser.deepWork = Math.min(95, currentUser.deepWork + (sessionQuality * 1));
+    }
+    currentUser.avgFocus = Math.round((currentUser.focusCapability + currentUser.consistency + currentUser.deepWork) / 3);
+
+    // Add to history
+    currentUser.sessionHistory.unshift({
+        task: task,
+        duration: formatDuration(elapsedSeconds),
+        hours: elapsedHours.toFixed(2),
+        date: today,
+        time: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+    });
+    if(currentUser.sessionHistory.length > 50) currentUser.sessionHistory.pop();
+
+    saveUser();
+    updateProfileUI();
+}
+
+function formatDuration(seconds){
+    const h = Math.floor(seconds/3600);
+    const m = Math.floor((seconds%3600)/60);
+    if(h>0) return h+'h '+(m>0?m+'m':'');
+    return m+'m';
+}
+
+function resetTimer(){
+    clearInterval(timerInterval);
+    isRunning = false;
+    remainingSeconds = totalSeconds;
+    updateDisplay();
+    document.getElementById('startBtn').innerHTML = '<span><i class="fas fa-play"></i> Start</span>';
+    document.getElementById('startBtn').className = 'ctrl-btn btn-start';
+    document.getElementById('focusIndicator').classList.remove('active');
+    document.getElementById('focusStatus').textContent = 'Ready';
+    showToast('Timer reset','info');
+}
+
+function againTimer(){
+    resetTimer();
+    setTimeout(()=>toggleTimer(),300);
+}
+
+// ===================== PROFILE UI =====================
+function updateProfileUI(){
+    if(!currentUser) return;
+    document.getElementById('profileNameDisplay').textContent = currentUser.name;
+    const level = getLevel(currentUser.focusCapability);
+    document.getElementById('profileLevelDisplay').textContent = level.title + ' · Level ' + level.level;
+    document.getElementById('pTotalHours').textContent = currentUser.totalHours.toFixed(1);
+    document.getElementById('pSessions').textContent = currentUser.sessions;
+    document.getElementById('pAvgFocus').textContent = Math.round(currentUser.avgFocus)+'%';
+    document.getElementById('pStreak').textContent = currentUser.streak;
+    document.getElementById('capValue').textContent = Math.round(currentUser.focusCapability)+'%';
+    document.getElementById('capFill').style.width = currentUser.focusCapability+'%';
+    document.getElementById('conValue').textContent = Math.round(currentUser.consistency)+'%';
+    document.getElementById('conFill').style.width = currentUser.consistency+'%';
+    document.getElementById('deepValue').textContent = Math.round(currentUser.deepWork)+'%';
+    document.getElementById('deepFill').style.width = currentUser.deepWork+'%';
+    // Focus modal
+    document.getElementById('focusScore').textContent = Math.round(currentUser.avgFocus)+'%';
+    document.getElementById('focusRingProgress').style.strokeDashoffset = 377*(1-currentUser.avgFocus/100);
+    document.getElementById('todayHours').textContent = currentUser.todayHours.toFixed(1);
+    document.getElementById('weekHours').textContent = currentUser.weekHours.toFixed(1);
+    document.getElementById('monthTotalHours').textContent = currentUser.monthHours.toFixed(1);
+    document.getElementById('bestStreakVal').textContent = currentUser.bestStreak;
+    document.getElementById('totalFocusVal').textContent = currentUser.allTime.toFixed(1)+'h';
+    updateAssessment();
+}
+
+function getLevel(capability){
+    if(capability>=90) return {title:'Focus Legend', level:10};
+    if(capability>=80) return {title:'Focus Master', level:9};
+    if(capability>=70) return {title:'Focus Architect', level:8};
+    if(capability>=60) return {title:'Focus Expert', level:7};
+    if(capability>=50) return {title:'Focus Adept', level:6};
+    if(capability>=40) return {title:'Focus Scholar', level:5};
+    if(capability>=30) return {title:'Focus Student', level:4};
+    if(capability>=20) return {title:'Focus Apprentice', level:3};
+    if(capability>=10) return {title:'Focus Novice', level:2};
+    return {title:'Focus Beginner', level:1};
+}
+
+function updateAssessment(){
+    if(!currentUser) return;
+    const cap = currentUser.focusCapability;
+    let level = 'Beginner';
+    if(cap>=20) level = 'Novice';
+    if(cap>=30) level = 'Apprentice';
+    if(cap>=40) level = 'Scholar';
+    if(cap>=50) level = 'Adept';
+    if(cap>=60) level = 'Expert';
+    if(cap>=70) level = 'Architect';
+    if(cap>=80) level = 'Master';
+    if(cap>=90) level = 'Legend';
+
+    let rec = 'Start with shorter sessions to build your focus habit.';
+    if(cap>=20) rec = 'Good start! Try completing full 25-minute sessions without breaks.';
+    if(cap>=30) rec = 'Building momentum. Increase session length to 45 minutes.';
+    if(cap>=40) rec = 'Solid progress. Add a second daily session for faster growth.';
+    if(cap>=50) rec = 'Strong focus. Challenge yourself with 2-hour deep work blocks.';
+    if(cap>=60) rec = 'Impressive discipline. Maintain morning routines for peak performance.';
+    if(cap>=70) rec = 'Advanced capability. Your consistency is your superpower.';
+    if(cap>=80) rec = 'Master level achieved. Mentor others while pushing your limits.';
+    if(cap>=90) rec = 'Legendary status. You are among the most focused individuals.';
+
+    document.getElementById('assessmentText').innerHTML = 
+        'Your focus capability is <strong>'+level+'</strong>. You have completed <strong>'+
+        currentUser.sessions+'</strong> sessions totaling <strong>'+currentUser.allTime.toFixed(1)+
+        ' hours</strong>. Your best streak is <strong>'+currentUser.bestStreak+
+        ' days</strong>. '+rec;
+}
+
+function showHistory(){
+    const list = document.getElementById('historyList');
+    list.style.display = list.style.display === 'none' ? 'block' : 'none';
+    if(!currentUser || !currentUser.sessionHistory.length){
+        list.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:12px;">No sessions yet. Start your first focus block!</div>';
+        return;
+    }
+    list.innerHTML = currentUser.sessionHistory.slice(0,10).map(s=>{
+        return '<div class="history-item"><div><div class="h-task">'+s.task+'</div><div class="h-date">'+s.date+' at '+s.time+'</div></div><div class="h-time">'+s.duration+'</div></div>';
+    }).join('');
+}
+
+function exportData(){
+    if(!currentUser) return;
+    const dataStr = JSON.stringify(currentUser, null, 2);
+    const blob = new Blob([dataStr], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'onething_data_'+currentUser.username+'.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Data exported successfully','success');
+}
+
+// ===================== PROFILE TOGGLE =====================
+function toggleProfile(){
+    document.getElementById('profileDropdown').classList.toggle('active');
+}
+document.addEventListener('click',(e)=>{
+    const modal = document.getElementById('profileDropdown');
+    const btn = document.querySelector('.profile-trigger');
+    if(!modal.contains(e.target) && !btn.contains(e.target)){
+        modal.classList.remove('active');
+    }
+});
+
+// ===================== MODALS =====================
+function openModal(id){
+    document.getElementById(id).classList.add('active');
+    if(id==='calendarModal') renderCalendar();
+    if(id==='focusModal') renderWeeklyBars();
+}
+function closeModal(id){
+    document.getElementById(id).classList.remove('active');
+}
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+    overlay.addEventListener('click',(e)=>{
+        if(e.target===overlay) overlay.classList.remove('active');
+    });
+});
+
+// ===================== TOASTS =====================
+function showToast(message,type){
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    let icon = 'fa-info-circle'; let color = 'var(--gold)';
+    if(type==='warning'){ icon='fa-exclamation-triangle'; color='var(--gold-dark)'; }
+    if(type==='success'){ icon='fa-check-circle'; color='var(--gold)'; }
+    toast.style.borderLeftColor = color;
+    toast.innerHTML = '<i class="fas '+icon+'" style="color:'+color+';font-size:16px;"></i><span>'+message+'</span>';
+    container.appendChild(toast);
+    setTimeout(()=>toast.remove(),3800);
+}
+
+// ===================== CLOCK =====================
+function updateClock(){
+    const now = new Date();
+    let h = now.getHours();
+    const ampm = h>=12?'PM':'AM';
+    h = h%12||12;
+    const m = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('clockTime').textContent = String(h).padStart(2,'0')+':'+m;
+    document.getElementById('clockAmPm').textContent = ampm;
+}
+setInterval(updateClock,1000); updateClock();
+
+// ===================== MUSIC PLAYER =====================
+let isPlaying = false;
+let currentTrackIdx = 0;
+const tracks = [
+    {title:'Deep Focus',artist:'Instrumental Study Music',duration:'3:45',seconds:225,spotify:'https://open.spotify.com/search/deep%20focus%20instrumental'},
+    {title:'Lo-Fi Study',artist:'Chill Beats Collective',duration:'2:15',seconds:135,spotify:'https://open.spotify.com/search/lofi%20study%20beats'},
+    {title:'Brain Waves',artist:'Binaural Audio Lab',duration:'1:30',seconds:90,spotify:'https://open.spotify.com/search/binaural%20focus%20brain%20waves'},
+    {title:'Classical Focus',artist:'Piano & Strings',duration:'4:00',seconds:240,spotify:'https://open.spotify.com/search/classical%20focus%20piano'}
+];
+let playProgress = 0;
+let playInterval = null;
+let previewSeconds = 0;
+
+function togglePlay(){
+    isPlaying = !isPlaying;
+    const vinyl = document.getElementById('vinyl');
+    const icon = document.getElementById('playIcon');
+    if(isPlaying){
+        vinyl.classList.add('playing');
+        icon.className = 'fas fa-pause-circle';
+        showToast('Previewing: '+tracks[currentTrackIdx].title,'success');
+        clearInterval(playInterval);
+        playInterval = setInterval(()=>{
+            previewSeconds++;
+            const total = tracks[currentTrackIdx].seconds || 180;
+            playProgress = Math.min(100, previewSeconds / total * 100);
+            updateTrackProgress();
+            if(previewSeconds >= total){ nextTrack(); }
+        },1000);
+    } else {
+        vinyl.classList.remove('playing');
+        icon.className = 'fas fa-play-circle';
+        showToast('Music paused','info');
+        clearInterval(playInterval);
+    }
+}
+function nextTrack(){
+    currentTrackIdx = (currentTrackIdx+1)%tracks.length;
+    loadTrack();
+}
+function prevTrack(){
+    currentTrackIdx = (currentTrackIdx-1+tracks.length)%tracks.length;
+    loadTrack();
+}
+function loadTrack(){
+    const t = tracks[currentTrackIdx];
+    document.getElementById('trackTitle').textContent = t.title;
+    document.getElementById('trackArtist').textContent = t.artist;
+    document.getElementById('trackTotal').textContent = t.duration;
+    playProgress = 0;
+    previewSeconds = 0;
+    updateTrackProgress();
+    if(isPlaying) showToast('Previewing: '+t.title,'success');
+}
+function loadPlaylist(name){
+    const idx = tracks.findIndex(t=>t.title===name);
+    if(idx>=0){ currentTrackIdx = idx; loadTrack(); showToast('Selected: '+tracks[currentTrackIdx].title,'success'); }
+}
+function seekTrack(e){
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = (e.clientX-rect.left)/rect.width*100;
+    playProgress = Math.max(0,Math.min(100,pct));
+    previewSeconds = Math.round((tracks[currentTrackIdx].seconds || 180) * playProgress / 100);
+    updateTrackProgress();
+}
+function updateTrackProgress(){
+    document.getElementById('trackProgress').style.width = playProgress+'%';
+    document.getElementById('trackCurrent').textContent = formatTrackTime(previewSeconds);
+}
+function formatTrackTime(seconds){
+    const m = Math.floor(seconds/60);
+    const s = String(seconds%60).padStart(2,'0');
+    return m+':'+s;
+}
+function connectSpotify(){
+    const track = tracks[currentTrackIdx];
+    window.open(track.spotify, '_blank');
+    showToast('Opening Spotify for '+track.title,'success');
+}
+
+// ===================== CALENDAR =====================
+let calMonth = new Date().getMonth();
+let calYear = new Date().getFullYear();
+let selectedScheduleDate = new Date().toISOString().split('T')[0];
+
+function renderCalendar(){
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('calMonthTitle').textContent = months[calMonth]+' '+calYear;
+    const grid = document.getElementById('calDays');
+    grid.innerHTML = '';
+    const firstDay = new Date(calYear,calMonth,1).getDay();
+    const daysInMonth = new Date(calYear,calMonth+1,0).getDate();
+    const today = new Date().getDate();
+    const isCurrentMonth = calMonth===new Date().getMonth() && calYear===new Date().getFullYear();
+
+    let monthTotal = 0;
+    let activeDays = 0;
+
+    for(let i=0;i<firstDay;i++) grid.innerHTML += '<div></div>';
+    for(let day=1;day<=daysInMonth;day++){
+        const div = document.createElement('div');
+        div.className = 'cal-day';
+        const key = calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+        let hours = 0;
+        if(currentUser && currentUser.focusData[key]){
+            hours = currentUser.focusData[key];
+        }
+        div.textContent = day;
+        if(isCurrentMonth && day===today) div.classList.add('today');
+        if(hours > 0){
+            div.classList.add('focus-day');
+            div.innerHTML = day+'<span class="focus-hours">'+hours.toFixed(1)+'h</span>';
+            monthTotal += hours;
+            activeDays++;
+        }
+        if(currentUser && currentUser.scheduleData && currentUser.scheduleData[key] && currentUser.scheduleData[key].length){
+            div.classList.add('scheduled-day');
+        }
+        if(key === selectedScheduleDate) div.classList.add('selected-day');
+        div.onclick = () => selectScheduleDate(key);
+        grid.appendChild(div);
+    }
+
+    // Update summary
+    const avg = activeDays > 0 ? (monthTotal/activeDays).toFixed(1) : '0.0';
+    document.getElementById('monthHours').textContent = monthTotal.toFixed(1);
+    document.getElementById('monthDays').textContent = activeDays;
+    document.getElementById('monthAvg').textContent = avg;
+    renderSchedulePanel();
+}
+
+function changeMonth(delta){
+    calMonth += delta;
+    if(calMonth>11){ calMonth=0; calYear++; }
+    if(calMonth<0){ calMonth=11; calYear--; }
+    renderCalendar();
+}
+
+function selectScheduleDate(dateKey){
+    selectedScheduleDate = dateKey;
+    renderCalendar();
+}
+
+function formatScheduleDate(dateKey){
+    const date = new Date(dateKey + 'T00:00:00');
+    return date.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric', year:'numeric'});
+}
+
+function renderSchedulePanel(){
+    const title = document.getElementById('scheduleDateTitle');
+    const list = document.getElementById('scheduleList');
+    if(!title || !list) return;
+    title.textContent = 'Schedule for ' + formatScheduleDate(selectedScheduleDate);
+    const items = currentUser && currentUser.scheduleData ? (currentUser.scheduleData[selectedScheduleDate] || []) : [];
+    if(!items.length){
+        list.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:8px;">No focus blocks planned for this date yet.</div>';
+        return;
+    }
+    list.innerHTML = items.map((item, index) =>
+        '<div class="schedule-item"><div><div class="schedule-item-title">'+escapeHtml(item.task)+'</div><div class="schedule-item-meta">'+
+        item.time+' · '+item.duration+' min</div></div><button class="schedule-delete" onclick="deleteScheduleItem('+index+')" title="Remove"><i class="fas fa-trash"></i></button></div>'
+    ).join('');
+}
+
+function addScheduleItem(){
+    if(!currentUser){ showToast('Log in to schedule focus blocks','warning'); return; }
+    normalizeUserData();
+    const taskInput = document.getElementById('scheduleTask');
+    const timeInput = document.getElementById('scheduleTime');
+    const durationInput = document.getElementById('scheduleDuration');
+    const task = taskInput.value.trim() || 'Focus Session';
+    const time = timeInput.value || '09:00';
+    const duration = Math.max(5, parseInt(durationInput.value, 10) || 60);
+    if(!currentUser.scheduleData[selectedScheduleDate]) currentUser.scheduleData[selectedScheduleDate] = [];
+    currentUser.scheduleData[selectedScheduleDate].push({task, time, duration});
+    currentUser.scheduleData[selectedScheduleDate].sort((a,b)=>a.time.localeCompare(b.time));
+    taskInput.value = '';
+    saveUser();
+    renderCalendar();
+    showToast('Scheduled for '+formatScheduleDate(selectedScheduleDate),'success');
+}
+
+function deleteScheduleItem(index){
+    if(!currentUser || !currentUser.scheduleData || !currentUser.scheduleData[selectedScheduleDate]) return;
+    currentUser.scheduleData[selectedScheduleDate].splice(index, 1);
+    if(!currentUser.scheduleData[selectedScheduleDate].length) delete currentUser.scheduleData[selectedScheduleDate];
+    saveUser();
+    renderCalendar();
+    showToast('Schedule item removed','info');
+}
+
+function escapeHtml(value){
+    return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[char]));
+}
+
+function openFocusInsights(){
+    document.getElementById('profileDropdown').classList.remove('active');
+    openModal('focusModal');
+}
+
+// ===================== WEEKLY BARS =====================
+function renderWeeklyBars(){
+    const container = document.getElementById('weeklyBars');
+    container.innerHTML = '';
+    const days = ['M','T','W','T','F','S','S'];
+    const data = currentUser ? currentUser.weeklyData : [0,0,0,0,0,0,0];
+    const maxVal = Math.max(...data, 0.1);
+    data.forEach((val,i)=>{
+        const bar = document.createElement('div');
+        bar.className = 'w-bar';
+        bar.setAttribute('data-day',days[i]);
+        bar.style.height = (val/maxVal*100)+'%';
+        container.appendChild(bar);
+    });
+}
+
+// ===================== THEMES =====================
+const themes = [
+    {name:'Midnight Rain', image:'Copilot_20260627_100934.png', fallback:'radial-gradient(circle at 20% 20%, rgba(201,168,76,0.14), transparent 28%), linear-gradient(135deg, #070707, #15110d 55%, #050505)'},
+    {name:'Golden Sunset', image:'Copilot_20260627_100847.png', fallback:'radial-gradient(circle at 75% 20%, rgba(232,213,163,0.18), transparent 30%), linear-gradient(135deg, #160f09, #2c1d10 55%, #090706)'},
+    {name:'Morning Calm', image:'Copilot_20260627_101126.png', fallback:'radial-gradient(circle at 35% 15%, rgba(245,240,232,0.12), transparent 28%), linear-gradient(135deg, #111816, #1e241d 55%, #080b0a)'},
+    {name:'Cozy Studio', image:'Copilot_20260627_101233.png', fallback:'radial-gradient(circle at 50% 20%, rgba(201,168,76,0.12), transparent 32%), linear-gradient(135deg, #120d0a, #211713 55%, #070504)'}
+];
+const timerFonts = [
+    "'Cinzel', serif",
+    "'Inter', sans-serif",
+    "'Cormorant Garamond', serif",
+    "Georgia, serif"
+];
+function setTheme(idx,el){
+    applyTheme(idx, true);
+}
+function applyTheme(idx, notify){
+    const theme = themes[idx] || themes[0];
+    document.querySelectorAll('.theme-opt').forEach((t,i)=>{
+        const optionTheme = themes[i] || themes[0];
+        t.classList.toggle('active', i===idx);
+        t.style.backgroundImage = "url('"+optionTheme.image+"'), "+optionTheme.fallback;
+    });
+    const bg = document.getElementById('bgLayer');
+    bg.style.backgroundImage = "url('"+theme.image+"'), "+theme.fallback;
+    if(notify && currentUser){ currentUser.theme = idx; saveUser(); }
+    if(notify) showToast('Ambience: '+theme.name,'success');
+}
+function setTimerFont(idx, el){
+    applyTimerFont(idx, true);
+}
+function applyTimerFont(idx, notify){
+    const font = timerFonts[idx] || timerFonts[0];
+    document.documentElement.style.setProperty('--timer-font', font);
+    document.querySelectorAll('.font-opt').forEach((option,i)=>option.classList.toggle('active', i===idx));
+    if(notify && currentUser){ currentUser.timerFont = idx; saveUser(); }
+    if(notify) showToast('Timer font updated','success');
+}
+
+// ===================== CHIME =====================
+function playChime(){
+    try{
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(523.25,ctx.currentTime);
+        osc.frequency.setValueAtTime(659.25,ctx.currentTime+0.2);
+        osc.frequency.setValueAtTime(783.99,ctx.currentTime+0.4);
+        gain.gain.setValueAtTime(0.1,ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1.5);
+        osc.start(ctx.currentTime); osc.stop(ctx.currentTime+1.5);
+    }catch(e){}
+}
+
+// ===================== KEYBOARD =====================
+document.addEventListener('keydown',(e)=>{
+    if(e.code==='Space' && e.target.tagName!=='INPUT'){
+        e.preventDefault();
+        toggleTimer();
+    }
+    if(e.code==='KeyR' && e.ctrlKey){
+        e.preventDefault();
+        resetTimer();
+    }
+});
+
+// ===================== INIT =====================
+if(!checkAutoLogin()){
+    // Show login screen
+}
+</script>
+</body>
+</html>
